@@ -900,7 +900,7 @@ function startDomino() {
   dominoTimer = setInterval(()=>{
     if(dominoStopped || dominoStep >= 6){
       clearInterval(dominoTimer);
-      if(\!dominoStopped && dominoStep >= 6){
+      if(!dominoStopped && dominoStep >= 6){
         const m = document.getElementById('domino-msg');
         if(m){m.style.display='block';m.className='info-box red';m.innerHTML='<h4 style="color:#E03C31">Incident Occurred</h4>The full chain completed. When no one intervenes, a minor unreported hazard reaches its inevitable outcome. Click Reset to try again.';}
       }
@@ -1024,7 +1024,7 @@ function initHazard() {
 
 function foundHazard(id) {
   const h = HAZARDS.find(x=>x.id===id);
-  if(\!h || h.found) return;
+  if(!h || h.found) return;
   h.found = true; hazardFound++;
   // Turn ring green + stop animation
   const ring = document.getElementById(id+'-ring');
@@ -1040,7 +1040,7 @@ function foundHazard(id) {
 
 function showHazardResult(){
   HAZARDS.forEach(h=>{
-    if(\!h.found){
+    if(!h.found){
       const ring = document.getElementById(h.id+'-ring');
       if(ring){ ring.setAttribute('stroke','#E03C31'); ring.setAttribute('fill','rgba(224,60,49,.2)'); ring.innerHTML=''; }
       const txt = document.querySelector('#'+h.id+' text');
@@ -1048,7 +1048,7 @@ function showHazardResult(){
     }
   });
   const r = document.getElementById('hz-result');
-  if(\!r) return;
+  if(!r) return;
   r.style.display='block';
   const pct = Math.round(hazardFound/HAZARDS.length*100);
   r.className = 'info-box'+(pct<50?' red':'');
