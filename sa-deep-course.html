@@ -764,10 +764,12 @@ function renderSlide() {
 }
 
 function renderContent(slide) {
+  const isGame = slide.type && slide.type.startsWith('game-');
   return `<div class="slide-card">
     <h2>${slide.title}</h2>
     <div class="subtitle">${slide.subtitle}</div>
     ${slide.html||''}
+    ${isGame ? '<div id="game-zone"></div>' : ''}
   </div>`;
 }
 
@@ -845,7 +847,7 @@ function bindSlide(slide) {
 
 // ── DOMINO GAME ──────────────────────────────────────────────────────────────
 function initDomino() {
-  const card = document.querySelector('.slide-card');
+  const card = document.getElementById('game-zone');
   const zone = document.createElement('div');
   zone.id = 'domino-zone';
   const DOMS = [
@@ -929,7 +931,7 @@ const HAZARDS = [
 let hazardFound = 0, hazardTimer = null, hazardSeconds = 60;
 
 function initHazard() {
-  const card = document.querySelector('.slide-card');
+  const card = document.getElementById('game-zone');
   const zone = document.createElement('div');
   zone.id = 'hazard-zone';
 
@@ -1063,7 +1065,7 @@ const KIMS_ITEMS=[
 ];
 let kimsPhase='show', kimsTimer=null, kimsSeconds=30, kimsSelected=new Set(), kimsReveal=false;
 function initKims() {
-  const card=document.querySelector('.slide-card');
+  const card=document.getElementById('game-zone');
   card.innerHTML+=`
   <div id="kims-area">
     <div class="kims-timer" id="kims-clock">30s</div>
@@ -1122,7 +1124,7 @@ const SCAN_QS=[
 ];
 let scanPhase='ready', scanTimer=null, scanSeconds=5;
 function initScan(){
-  const card=document.querySelector('.slide-card');
+  const card=document.getElementById('game-zone');
   card.innerHTML+=`
   <div class="scan-stage" id="scan-stage">
     <div class="scan-countdown" id="scan-cd">TAP TO START</div>
@@ -1170,7 +1172,7 @@ function scoreScan(){
 
 // ── HALT CHECK ───────────────────────────────────────────────────────────────
 function initHalt(){
-  const card=document.querySelector('.slide-card');
+  const card=document.getElementById('game-zone');
   card.innerHTML+=`
   <div class="halt-grid">
     ${[
@@ -1208,7 +1210,7 @@ let breathTimer=null, breathPhase=0;
 const BREATH_PHASES=['Inhale...','Hold...','Exhale...','Hold...'];
 const BREATH_CLASSES=['expand','hold','contract','hold'];
 function initBreath(){
-  const card=document.querySelector('.slide-card');
+  const card=document.getElementById('game-zone');
   card.innerHTML+=`
   <div style="text-align:center">
     <div class="breath-circle" id="breath-circle">Ready</div>
