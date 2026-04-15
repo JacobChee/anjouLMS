@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AnjouHealth LMS — Workplace Health & Safety Training</title>
+<style>
+  :root {
+    /* AnjouHealth corporate palette */
+    --teal: #6DC12A;
+    --teal-dark: #3A7015;
+    --teal-light: #EFF8E4;
+    --mint: #4A9E1E;
+    --navy: #1A1A1A;
+    --white: #ffffff;
+    --off-white: #F7FAF3;
+    --grey-light: #E8F0DC;
+    --grey-mid: #A8B8A0;
+    --grey-text: #4A5240;
+    --danger: #E03C31;
+    --success: #3A7015;
+    --warning: #E8A020;
+    --radius: 12px;
+    --shadow: 0 4px 20px rgba(109,193,42,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--off-white); color: var(--navy); min-height: 100vh; }
+
+  /* ─── TOP NAV ─── */
+  .topbar { background: var(--navy); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+  .topbar-logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; }
+  .topbar-logo span { color: var(--mint); }
+  .topbar-tagline { font-size: 0.8rem; color: var(--grey-mid); }
+  .topbar-user { font-size: 0.85rem; color: var(--grey-mid); }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── HERO / CATALOG ─── */
+  .hero { background: linear-gradient(135deg, var(--navy) 0%, var(--teal-dark) 100%); color: white; padding: 48px 32px 40px; text-align: center; }
+  .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+  .hero h1 span { color: var(--mint); }
+  .hero p { font-size: 1rem; color: rgba(255,255,255,0.75); max-width: 560px; margin: 0 auto 24px; }
+  .hero-stats { display: flex; justify-content: center; gap: 40px; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--mint); }
+  .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 1px; }
+
+  .catalog-section { padding: 40px 32px; max-width: 1100px; margin: 0 auto; }
+  .section-header { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .section-header::after { content: ''; flex: 1; height: 2px; background: var(--grey-light); }
+
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .course-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 2px solid transparent; }
+  .course-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(109,193,42,0.18); border-color: var(--teal-light); }
+  .course-card-header { padding: 20px 20px 14px; display: flex; align-items: flex-start; gap: 14px; }
+  .course-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+  .course-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .course-meta { font-size: 0.78rem; color: var(--grey-text); }
+  .course-desc { padding: 0 20px 16px; font-size: 0.875rem; color: var(--grey-text); line-height: 1.55; }
+  .course-footer { padding: 12px 20px; background: var(--off-white); border-top: 1px solid var(--grey-light); display: flex; align-items: center; justify-content: space-between; }
+  .progress-bar-wrap { flex: 1; height: 6px; background: var(--grey-light); border-radius: 3px; margin-right: 12px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--teal), var(--mint)); transition: width 0.5s ease; }
+  .progress-label { font-size: 0.75rem; color: var(--grey-text); white-space: nowrap; }
+  .btn-start { background: var(--teal); color: white; border: none; border-radius: 8px; padding: 7px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .btn-start:hover { background: var(--teal-dark); }
+  .btn-start.completed { background: var(--success); }
+
+  /* ─── COURSE VIEW ─── */
+  .course-view { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+  .back-btn { background: none; border: 2px solid var(--teal); color: var(--teal); border-radius: 8px; padding: 7px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 24px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+  .back-btn:hover { background: var(--teal); color: white; }
+
+  .course-header-block { background: linear-gradient(135deg, var(--navy), var(--teal-dark)); color: white; border-radius: var(--radius); padding: 28px 28px 24px; margin-bottom: 28px; display: flex; gap: 20px; align-items: flex-start; }
+  .course-header-icon { font-size: 2.5rem; }
+  .course-header-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+  .course-header-desc { font-size: 0.9rem; color: rgba(255,255,255,0.75); line-height: 1.5; }
+  .course-header-stats { display: flex; gap: 24px; margin-top: 14px; }
+  .chs { text-align: left; }
+  .chs-num { font-size: 1.2rem; font-weight: 700; color: var(--mint); }
+  .chs-label { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+
+  .modules-list { display: flex; flex-direction: column; gap: 12px; }
+  .module-row { background: white; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px; padding: 16px 20px; cursor: pointer; transition: all 0.2s; border-left: 4px solid transparent; }
+  .module-row:hover { border-left-color: var(--teal); background: var(--teal-light); }
+  .module-row.locked { opacity: 0.5; cursor: not-allowed; }
+  .module-row.completed { border-left-color: var(--mint); }
+  .module-num { width: 36px; height: 36px; border-radius: 50%; background: var(--teal-light); color: var(--teal-dark); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .module-num.done { background: var(--mint); color: white; }
+  .module-info { flex: 1; }
+  .module-name { font-weight: 700; font-size: 0.95rem; color: var(--navy); }
+  .module-sub { font-size: 0.78rem; color: var(--grey-text); margin-top: 2px; }
+  .module-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+  .badge-done { background: #e8f5e9; color: var(--success); }
+  .badge-todo { background: var(--grey-light); color: var(--grey-text); }
+  .badge-locked { background: var(--grey-light); color: var(--grey-mid); }
+
+  /* ─── MODULE VIEW ─── */
+  .module-view { max-width: 820px; margin: 0 auto; padding: 32px 24px; }
+  .module-progress-bar { height: 5px; background: var(--grey-light); border-radius: 3px; margin-bottom: 28px; overflow: hidden; }
+  .module-progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--mint)); transition: width 0.4s ease; }
+
+  .slide-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px; min-height: 360px; display: flex; flex-direction: column; justify-content: flex-start; }
+  .slide-tag { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--teal); margin-bottom: 12px; }
+  .slide-title { font-size: 1.5rem; font-weight: 800; color: var(--navy); margin-bottom: 16px; line-height: 1.3; }
+  .slide-body { font-size: 0.95rem; color: var(--grey-text); line-height: 1.7; flex: 1; }
+  .slide-body ul { margin: 12px 0 12px 20px; }
+  .slide-body li { margin-bottom: 8px; }
+  .slide-body strong { color: var(--navy); }
+  .key-points { background: var(--teal-light); border-left: 4px solid var(--teal); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-top: 20px; }
+  .key-points-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--teal-dark); margin-bottom: 8px; }
+
+  .stat-row { display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+  .stat-block { flex: 1; min-width: 120px; background: var(--off-white); border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-block-num { font-size: 1.8rem; font-weight: 800; color: var(--teal); }
+  .stat-block-label { font-size: 0.75rem; color: var(--grey-text); margin-top: 4px; }
+
+  .slide-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+  .nav-btn { background: var(--teal); color: white; border: none; border-radius: 8px; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .nav-btn:hover { background: var(--teal-dark); }
+  .nav-btn:disabled { background: var(--grey-mid); cursor: not-allowed; }
+  .nav-btn.secondary { background: white; color: var(--teal); border: 2px solid var(--teal); }
+  .nav-btn.secondary:hover { background: var(--teal-light); }
+  .slide-counter { font-size: 0.85rem; color: var(--grey-text); }
+
+  /* ─── QUIZ ─── */
+  .quiz-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px; }
+  .quiz-header { background: linear-gradient(135deg, var(--navy), var(--teal-dark)); color: white; border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; }
+  .quiz-header h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+  .quiz-header p { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+  .quiz-q-num { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--teal); margin-bottom: 10px; }
+  .quiz-question { font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; line-height: 1.4; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .quiz-option { background: var(--off-white); border: 2px solid var(--grey-light); border-radius: 10px; padding: 13px 18px; cursor: pointer; font-size: 0.9rem; color: var(--navy); transition: all 0.15s; text-align: left; }
+  .quiz-option:hover:not(:disabled) { border-color: var(--teal); background: var(--teal-light); }
+  .quiz-option.selected { border-color: var(--teal); background: var(--teal-light); }
+  .quiz-option.correct { border-color: var(--success); background: #e8f5e9; color: var(--success); font-weight: 600; }
+  .quiz-option.wrong { border-color: var(--danger); background: #ffebee; color: var(--danger); }
+  .quiz-option:disabled { cursor: not-allowed; }
+  .quiz-feedback { border-radius: 8px; padding: 12px 16px; font-size: 0.88rem; margin-bottom: 16px; font-weight: 500; }
+  .quiz-feedback.correct { background: #e8f5e9; color: var(--success); }
+  .quiz-feedback.wrong { background: #ffebee; color: var(--danger); }
+
+  .quiz-results { text-align: center; padding: 20px 0; }
+  .quiz-score { font-size: 3rem; font-weight: 800; color: var(--teal); }
+  .quiz-score-label { font-size: 1rem; color: var(--grey-text); margin-bottom: 20px; }
+  .badge-earned { background: linear-gradient(135deg, var(--teal), var(--mint)); color: white; display: inline-block; border-radius: 40px; padding: 12px 28px; font-size: 1rem; font-weight: 700; margin: 16px 0; }
+
+  /* ─── COMPLETION ─── */
+  .completion-screen { text-align: center; padding: 60px 32px; }
+  .completion-icon { font-size: 5rem; margin-bottom: 16px; }
+  .completion-title { font-size: 2rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+  .completion-sub { font-size: 1rem; color: var(--grey-text); margin-bottom: 32px; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5rem; }
+    .hero-stats { gap: 20px; }
+    .courses-grid { grid-template-columns: 1fr; }
+    .catalog-section { padding: 28px 16px; }
+    .slide-card { padding: 24px; }
+    .quiz-card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-logo">Anjou<span>Health</span> LMS</div>
+    <div class="topbar-tagline">Workplace Health &amp; Safety Training</div>
+  </div>
+  <div class="topbar-user">Corporate Edition</div>
+</div>
+
+<!-- SCREEN: CATALOG -->
+<div id="screen-catalog" class="screen active">
+  <div class="hero">
+    <h1>Health &amp; Safety <span>Training Portal</span></h1>
+    <p>Microlearning modules built from AnjouHealth's field-tested workplace campaigns. Complete your courses, earn badges, and keep your team safe.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">11</div><div class="stat-label">Courses</div></div>
+      <div class="stat"><div class="stat-num">27</div><div class="stat-label">Modules</div></div>
+      <div class="stat"><div class="stat-num">~4h</div><div class="stat-label">Total Time</div></div>
+      <div class="stat"><div class="stat-num">96%</div><div class="stat-label">Avg Satisfaction</div></div>
+    </div>
+  </div>
+  <div class="catalog-section">
+    <div class="section-header">Your Courses</div>
+    <div class="courses-grid" id="courses-grid"></div>
+  </div>
+</div>
+
+<!-- SCREEN: COURSE -->
+<div id="screen-course" class="screen">
+  <div class="course-view">
+    <button class="back-btn" onclick="showCatalog()">← Back to Courses</button>
+    <div id="course-detail"></div>
+  </div>
+</div>
+
+<!-- SCREEN: MODULE -->
+<div id="screen-module" class="screen">
+  <div class="module-view" id="module-content"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════
+const COURSES = [
+  {
+    id: "sa",
+    title: "Situational Awareness",
+    icon: "👁️",
+    iconBg: "#EFF8E4",
+    duration: "25 min",
+    badge: "Eagle Eye",
+    deepCourse: "sa-deep-course.html",
+    description: "Learn to perceive, comprehend, and project hazards before they become incidents. Built from AnjouHealth's Situational Awareness campaign (150+ participants, 95.2% satisfaction).",
+    modules: [
+      {
+        id: "sa-1", title: "The Domino Effect",
+        sub: "How one overlooked detail triggers a chain of consequences",
+        slides: [
+          { tag: "Introduction", title: "Why Situational Awareness Matters", body: `Situational awareness (SA) is your ability to <strong>perceive, comprehend, and project</strong> what's happening in your environment — before a hazard becomes an incident.<br><br>In workplace safety, most incidents don't happen because of one big mistake. They happen because a <strong>series of small overlooked details</strong> compound into a crisis.<br><br>This module explores the Domino Effect — and how breaking any link in the chain prevents the collapse.` },
+          { tag: "Core Concept", title: "The Three Levels of Situational Awareness", body: `<ul><li><strong>Level 1 — Perceive:</strong> Noticing what's around you. Spotting the wet floor, the loose cable, the colleague who looks unwell.</li><li><strong>Level 2 — Comprehend:</strong> Understanding what it means. Wet floor = slip risk during peak foot traffic.</li><li><strong>Level 3 — Project:</strong> Anticipating what happens next. If no one acts, who gets hurt, and when?</li></ul><div class="key-points"><div class="key-points-title">Key Insight</div>Most workers stop at Level 1. The real skill is getting to Level 3 — projecting consequences before they unfold.</div>` },
+          { tag: "The Domino Effect", title: "One Overlooked Detail. Six Consequences.", body: `Imagine a worker notices a loose cable on the floor — and says nothing.<br><br><ul><li>A colleague trips and drops equipment</li><li>Equipment damages a server rack</li><li>A data outage is triggered</li><li>Emergency response is delayed</li><li>The site loses hours of productivity</li><li>The original cable remains unreported</li></ul><br>The chain only breaks if <strong>someone acts at Step 1</strong>. The entire cascade is preventable.`, keypoints: ["Report hazards immediately — don't assume someone else will", "Any observation, no matter how small, is worth reporting", "Breaking the chain early costs nothing. Waiting costs everything."] },
+          { tag: "Takeaways", title: "Your 3 Reporting Habits", body: `<ul><li><strong>Speak up immediately</strong> — never assume a hazard is already known</li><li><strong>Use your safety reporting system</strong> — verbal alerts are fast but digital logs create accountability</li><li><strong>Follow up</strong> — if you reported something and nothing changed, escalate</li></ul><div class="key-points"><div class="key-points-title">Remember</div>The most dangerous hazard is the one everyone sees but nobody reports.</div>` }
+        ],
+        quiz: [
+          { q: "A worker notices a wet floor near a stairwell but assumes someone else will report it. What level of situational awareness are they demonstrating?", options: ["Level 1 only — they perceived the hazard but didn't act on it", "Level 2 — they understood the hazard", "Level 3 — they projected what would happen next", "Full SA — they covered all three levels"], answer: 0, explanation: "They perceived the hazard (Level 1) but failed to comprehend its consequences or project the risk — so they stayed at Level 1." },
+          { q: "In the Domino Effect model, which action has the greatest impact on preventing an incident?", options: ["Filling in a report after an incident occurs", "Acting on the very first observed hazard", "Waiting for a safety officer to inspect the area", "Installing more CCTV cameras"], answer: 1, explanation: "Acting at the first link in the chain — the first observed hazard — prevents the entire cascade from happening." },
+          { q: "Which of the following is NOT one of the three levels of situational awareness?", options: ["Perceive", "Comprehend", "Report", "Project"], answer: 2, explanation: "The three levels are Perceive, Comprehend, and Project. Reporting is an important action, but it's not one of the SA levels." }
+        ]
+      },
+      {
+        id: "sa-2", title: "Peripheral Vision & Observation",
+        sub: "Sharpen your built-in safety radar",
+        slides: [
+          { tag: "Introduction", title: "Your Eyes Are More Powerful Than You Think", body: `Peripheral vision is your <strong>built-in safety radar</strong>. It covers up to 180° of your field of view and detects motion, contrast, and change — even when you're focused on something else.<br><br>In high-risk environments like data centres, construction sites, and warehouses, peripheral vision catches hazards that direct focus misses entirely.` },
+          { tag: "The Kim's Game", title: "Training Observational Sharpness", body: `The classic <em>Kim's Game</em> — used in military and safety training — proves that observational skill is <strong>trainable</strong>, not fixed.<br><br>In the original game, participants memorise a tray of objects, then recall them after the tray is covered. Over time, participants improve dramatically.<br><br>The lesson: <strong>what you notice depends on how much you've trained your attention</strong>.`, keypoints: ["Look for what's changed, not just what's there", "Scan systematically — don't fixate on one area", "Brief visual scans on entry to any new area builds the habit"] },
+          { tag: "Practical Technique", title: "The Entry Scan Habit", body: `Every time you enter a new workspace, do a 5-second scan:<br><br><ul><li><strong>Overhead:</strong> Is anything hanging, leaking, or unstable?</li><li><strong>Floor level:</strong> Cables, spills, uneven surfaces, stored items</li><li><strong>Movement:</strong> Colleagues, machinery, forklifts in motion</li><li><strong>Exits:</strong> Are they clear and accessible?</li></ul><br>This 5-second habit, done consistently, catches the hazards that cause the most incidents.` },
+          { tag: "Takeaways", title: "Module Summary", body: `<ul><li>Peripheral vision is a <strong>trainable safety skill</strong> — not a fixed trait</li><li>The Entry Scan takes 5 seconds and dramatically increases hazard detection</li><li>Observational sharpness is built through <strong>daily practice</strong>, not periodic training</li></ul>` }
+        ],
+        quiz: [
+          { q: "What does the Entry Scan help you do?", options: ["File a formal safety report", "Quickly assess a new workspace for hazards on entry", "Replace the need for a safety officer", "Log your working hours"], answer: 1, explanation: "The Entry Scan is a 5-second habit performed when entering a new workspace to systematically identify hazards." },
+          { q: "Kim's Game is used in situational awareness training to demonstrate that:", options: ["Older workers have worse memory", "Observational skills are fixed at birth", "Observational sharpness can be trained and improved over time", "Teams are better at spotting hazards than individuals"], answer: 2, explanation: "Kim's Game shows that with practice, your ability to observe and recall environmental details improves significantly." }
+        ]
+      },
+      {
+        id: "sa-3", title: "Mental Wellbeing & Focus",
+        sub: "How burnout and fatigue reduce hazard perception",
+        slides: [
+          { tag: "The Hidden Risk", title: "When Your Mind Can't See Danger", body: `Situational awareness isn't just about your eyes — it's about your <strong>cognitive state</strong>.<br><br>Burnout, fatigue, anxiety, and distraction all reduce your ability to perceive and process hazards. A worker under chronic stress operates at effectively a <strong>lower level of consciousness</strong> in safety terms.` },
+          { tag: "Evidence", title: "The Impact of Fatigue on Safety", body: `<ul><li><strong>24 hours without sleep</strong> produces cognitive impairment equivalent to a blood alcohol level of 0.10%</li><li>Fatigue reduces reaction time by up to <strong>40%</strong></li><li>Workers at peak stress are <strong>3× more likely</strong> to report near-miss incidents</li></ul><div class="key-points"><div class="key-points-title">The Workplace Implication</div>Mental health is a safety metric. A team that is burned out is a team at higher injury risk.</div>` },
+          { tag: "Strategies", title: "Maintaining Focus On-Site", body: `<ul><li><strong>Micro-breaks:</strong> 5-minute breaks every 90 minutes maintain attention quality</li><li><strong>Task switching:</strong> Rotating between tasks reduces attentional fatigue</li><li><strong>Speak up culture:</strong> If you're not fit to work safely, say so — it protects everyone</li><li><strong>Stress signals:</strong> Learn to recognise when you're becoming a risk to yourself</li></ul>` }
+        ],
+        quiz: [
+          { q: "Fatigue reduces reaction time by approximately how much?", options: ["10%", "20%", "40%", "60%"], answer: 2, explanation: "Research shows fatigue can reduce reaction time by up to 40%, significantly increasing the risk of workplace incidents." },
+          { q: "Why is mental health considered a safety metric in workplace safety?", options: ["Because stressed workers file more paperwork", "Because burnout and fatigue reduce hazard perception and reaction time", "Because happy workers earn more", "It is not — mental health and safety are unrelated"], answer: 1, explanation: "Mental states like burnout, fatigue, and anxiety directly reduce a worker's ability to perceive and respond to hazards." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "stf",
+    title: "Slip, Trip & Fall Prevention",
+    icon: "🦺",
+    iconBg: "#fff3e0",
+    duration: "22 min",
+    badge: "Hazard Hunter",
+    description: "Based on AnjouHealth's STF 2025 campaign run across 3 Google data centres in Taiwan. 133 participants, interactive hazard spotting, VR scenarios, and podiatry consultations.",
+    modules: [
+      {
+        id: "stf-1", title: "Understanding STF Hazards",
+        sub: "Recognising slip, trip and fall risks in your environment",
+        slides: [
+          { tag: "The Numbers", title: "Slip, Trip & Fall: The Real Cost", body: `Slip, trip, and fall (STF) incidents are the <strong>most common cause of workplace injury</strong> globally — and among the most preventable.<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">1 in 3</div><div class="stat-block-label">Workplace injuries are STF-related</div></div><div class="stat-block"><div class="stat-block-num">47%</div><div class="stat-block-label">Occur at floor level</div></div><div class="stat-block"><div class="stat-block-num">&gt;70%</div><div class="stat-block-label">Are preventable with basic hazard control</div></div></div>` },
+          { tag: "Hazard Types", title: "The Four Main STF Hazard Categories", body: `<ul><li><strong>Surface hazards:</strong> Wet floors, uneven surfaces, loose mats, polished tiles</li><li><strong>Environmental hazards:</strong> Poor lighting, cluttered walkways, blind corners</li><li><strong>Human factors:</strong> Distraction, rushing, inappropriate footwear, fatigue</li><li><strong>Equipment hazards:</strong> Exposed cables, improperly stored tools, open drawers</li></ul><div class="key-points"><div class="key-points-title">Data Centre Specific</div>In DC environments, cables, server rack doors, and wet-cleaning schedules are the top STF contributors.</div>` },
+          { tag: "Hazard Identification", title: "Spotting STF Risks: A Practical Guide", body: `Use the <strong>SPOT framework</strong> when entering any work area:<br><br><ul><li><strong>S — Surface:</strong> Check floors for spills, damage, or contamination</li><li><strong>P — Path:</strong> Is your walking path clear and well-lit?</li><li><strong>O — Objects:</strong> Are any items stored in walkways or creating trip hazards?</li><li><strong>T — Tools:</strong> Are cables, equipment, and tools properly secured?</li></ul>` }
+        ],
+        quiz: [
+          { q: "Which of the following is a 'human factor' STF hazard?", options: ["A wet floor", "A loose cable", "Rushing while distracted", "Poor lighting"], answer: 2, explanation: "Human factors include behaviours like rushing, distraction, and fatigue. The others are environmental or equipment hazards." },
+          { q: "What does the 'P' stand for in the SPOT framework?", options: ["Protect", "Path", "Prevent", "Personnel"], answer: 1, explanation: "SPOT stands for Surface, Path, Objects, Tools — a quick walk-through framework for identifying STF hazards." },
+          { q: "Approximately what percentage of STF incidents are preventable with basic hazard control?", options: ["20%", "40%", "55%", "More than 70%"], answer: 3, explanation: "Research consistently shows that more than 70% of STF incidents are preventable through basic hazard identification and control." }
+        ]
+      },
+      {
+        id: "stf-2", title: "Footwear & Balance Science",
+        sub: "Choosing footwear that protects you",
+        slides: [
+          { tag: "Science of Grip", title: "Not All Shoes Are Equal", body: `Your footwear is your <strong>primary STF prevention tool</strong>. The grip between your shoe and the floor determines whether a slip becomes an incident or a near-miss.<br><br>Key footwear properties:<br><ul><li><strong>Outsole material:</strong> Rubber outperforms leather and plastic in wet conditions</li><li><strong>Tread pattern:</strong> Channel treads disperse liquid and maintain contact</li><li><strong>Heel height:</strong> Lower heels reduce centre-of-gravity shifts</li><li><strong>Fit:</strong> Shoes that are too loose or too tight impair stability</li></ul>` },
+          { tag: "Shoe Assessment", title: "When to Replace Your Work Shoes", body: `<ul><li>Tread depth worn to less than <strong>1.6mm</strong> (same rule as car tyres)</li><li>Uneven wear — more on one side than the other</li><li>Sole starting to separate from the upper</li><li>Cushioning visibly compressed or flattened</li></ul><div class="key-points"><div class="key-points-title">Podiatrist Tip</div>Get your foot posture assessed annually. Flat feet or high arches change your stability profile and affect which footwear is safest for you.</div>` },
+          { tag: "Balance", title: "The Three Pillars of Stability", body: `Balance isn't just about footwear — it's about three body systems working together:<br><br><ul><li><strong>Visual system:</strong> Your eyes track spatial position — impaired at night or when tired</li><li><strong>Vestibular system:</strong> Your inner ear detects motion and orientation</li><li><strong>Proprioception:</strong> Your muscles and joints sense body position in space</li></ul><br>All three degrade under fatigue, stress, and distraction.` }
+        ],
+        quiz: [
+          { q: "Which outsole material provides the best grip in wet conditions?", options: ["Leather", "Hard plastic", "Rubber", "Foam"], answer: 2, explanation: "Rubber outsoles maintain the best grip across surface types and in wet conditions due to their flexibility and friction properties." },
+          { q: "What is the tread depth at which work shoes should be replaced?", options: ["3mm", "1.6mm", "5mm", "0.5mm"], answer: 1, explanation: "Like car tyres, shoe treads below 1.6mm lose significant grip capability and should be replaced." }
+        ]
+      },
+      {
+        id: "stf-3", title: "Spill Response Procedures",
+        sub: "From SPOT to safe: responding to chemical and liquid spills",
+        slides: [
+          { tag: "Immediate Response", title: "The 4-Step Spill Response", body: `When you encounter a spill:<br><br><ul><li><strong>Step 1 — Isolate:</strong> Immediately cordon off the area to prevent others from walking through it</li><li><strong>Step 2 — Identify:</strong> What is the substance? Chemical vs. water requires different responses</li><li><strong>Step 3 — Contain:</strong> Use appropriate materials (absorbent pads, barriers) to prevent spread</li><li><strong>Step 4 — Report:</strong> Log the incident and the response, even if you cleaned it up</li></ul>` },
+          { tag: "Chemical Spills", title: "When NOT to Clean Up Yourself", body: `Chemical spills in data centres and industrial environments require specialist handling when:<br><ul><li>The substance is <strong>unknown</strong></li><li>You don't have <strong>appropriate PPE</strong></li><li>The spill covers more than <strong>1 square metre</strong></li><li>There's any visible fuming, discolouration, or strong odour</li></ul><div class="key-points"><div class="key-points-title">Rule</div>When in doubt, isolate and call — never attempt to clean an unknown chemical without proper training and PPE.</div>` }
+        ],
+        quiz: [
+          { q: "What is the FIRST step when you encounter a spill in the workplace?", options: ["Clean it up immediately", "Isolate the area to prevent others from walking through it", "Take a photo and email your supervisor", "Identify the substance"], answer: 1, explanation: "Isolating the area first prevents additional people from being exposed to the hazard while you assess and respond." },
+          { q: "Which of the following situations requires you to NOT attempt cleaning a spill yourself?", options: ["A water spill near the entrance", "A small coffee spill on a desk", "An unknown substance with strong fumes", "A small puddle from a leaking bottle"], answer: 2, explanation: "Unknown substances with fumes may be hazardous chemicals requiring specialist PPE and trained response — never clean these without proper equipment." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "elec",
+    title: "Electrical Safety",
+    icon: "⚡",
+    iconBg: "#fffde7",
+    duration: "28 min",
+    badge: "Circuit Guard",
+    description: "Based on AnjouHealth's Electrical Safety campaign — 273 participants, 95.6% satisfaction. Covers home electrical safety, arc flash, LOTO procedures, and emergency rescue.",
+    modules: [
+      {
+        id: "elec-1", title: "Home & Workplace Electrical Hazards",
+        sub: "Recognising and preventing everyday electrical risks",
+        slides: [
+          { tag: "The Hazard Landscape", title: "Electricity: Invisible and Unforgiving", body: `Electrical hazards cause more workplace fatalities than almost any other category — yet most are preventable with basic awareness and procedure.<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">1,000+</div><div class="stat-block-label">Workplace electrical fatalities per year globally</div></div><div class="stat-block"><div class="stat-block-num">30%</div><div class="stat-block-label">Caused by overloaded circuits</div></div></div>` },
+          { tag: "Home Safety", title: "5 Electrical Safety Essentials at Home", body: `<ul><li><strong>Never overload sockets</strong> — one extension lead per socket maximum</li><li><strong>Check for frayed cords</strong> — replace, never tape</li><li><strong>RCCB (Residual Current Circuit Breaker)</strong> — ensure your home has one; it cuts power in milliseconds during a fault</li><li><strong>Water and electricity</strong> — maintain 1m clearance minimum near water sources</li><li><strong>Unplug when not in use</strong> — appliances on standby are a low-level fire risk</li></ul>` },
+          { tag: "Workplace Hazards", title: "Data Centre Electrical Risks", body: `In data centre environments, specific hazards require special attention:<br><br><ul><li><strong>Arc flash:</strong> A sudden discharge of electrical energy that produces intense heat (up to 35,000°F) and pressure waves</li><li><strong>Thermal runaway:</strong> Battery systems that overheat and enter a self-sustaining heat cycle</li><li><strong>High-voltage shock:</strong> Exposed busbars, PDU panels, and UPS systems</li></ul><div class="key-points"><div class="key-points-title">Rule</div>Never open electrical enclosures without confirmed de-energisation. Visual isolation is not enough.</div>` }
+        ],
+        quiz: [
+          { q: "What does RCCB stand for and what does it do?", options: ["Remote Control Circuit Board — it controls power remotely", "Residual Current Circuit Breaker — it cuts power immediately during a fault", "Regulated Circuit Control Box — it monitors power draw", "Rapid Charge Control Box — it manages charging speed"], answer: 1, explanation: "RCCB stands for Residual Current Circuit Breaker. It detects fault currents and cuts power in milliseconds, preventing electrocution." },
+          { q: "Which of the following is the CORRECT action before opening an electrical enclosure?", options: ["Wear rubber gloves and proceed", "Confirm the system is de-energised, not just visually isolated", "Ensure the lights in the room are on for visibility", "Inform a colleague you are doing it"], answer: 1, explanation: "Visual isolation (e.g. switches appearing off) is not sufficient. Systems must be confirmed de-energised through testing before any enclosure is opened." }
+        ]
+      },
+      {
+        id: "elec-2", title: "Arc Flash & PPE",
+        sub: "Understanding arc flash boundaries and protective equipment",
+        slides: [
+          { tag: "What Is Arc Flash", title: "The Most Dangerous Electrical Event", body: `An arc flash is an unintended discharge of electrical energy through the air between conductors. In milliseconds it produces:<br><ul><li>Temperatures up to <strong>35,000°F</strong> (3× hotter than the sun's surface)</li><li>Pressure waves that can throw workers across a room</li><li>Molten metal projectiles</li><li>Blinding UV light</li></ul><br>It can be triggered by a tool slip, a dust particle, or condensation.` },
+          { tag: "Boundaries", title: "Arc Flash Boundary Zones", body: `Three protection boundaries are defined around any energised equipment:<br><br><ul><li><strong>Flash Protection Boundary:</strong> Outer zone — curable burns without PPE if breached briefly</li><li><strong>Limited Approach Boundary:</strong> Only qualified electrical workers may enter</li><li><strong>Restricted Approach Boundary:</strong> Equivalent to contact distance — PPE required at all times</li></ul>` },
+          { tag: "PPE", title: "Arc-Rated PPE: What to Wear When", body: `PPE is rated in calories per cm² (cal/cm²) — the higher the rating, the more protection:<br><ul><li><strong>Category 1 (4 cal/cm²):</strong> FR shirt and trousers, safety glasses</li><li><strong>Category 2 (8 cal/cm²):</strong> Arc flash suit, face shield</li><li><strong>Category 4 (40 cal/cm²):</strong> Full arc flash suit, hood, face shield, leather gloves — for high-energy DC work</li></ul><div class="key-points"><div class="key-points-title">Key Rule</div>Never wear synthetic fibres near energised equipment. Nylon and polyester melt and bond to skin.</div>` }
+        ],
+        quiz: [
+          { q: "What is the maximum temperature produced by an arc flash?", options: ["5,000°F", "15,000°F", "35,000°F", "50,000°F"], answer: 2, explanation: "Arc flashes can reach temperatures up to 35,000°F — approximately 3 times the temperature of the sun's surface." },
+          { q: "Why should synthetic fibres never be worn near energised electrical equipment?", options: ["They conduct electricity more easily", "They melt and bond to skin, causing worse burns", "They reduce arc flash boundary distances", "They increase the risk of static discharge"], answer: 1, explanation: "Synthetic materials like nylon and polyester melt at relatively low temperatures and can fuse to skin, dramatically worsening burn injuries." }
+        ]
+      },
+      {
+        id: "elec-3", title: "Lockout-Tagout (LOTO) Procedures",
+        sub: "Safely isolating energy before maintenance work",
+        slides: [
+          { tag: "What Is LOTO", title: "The Lockout-Tagout System", body: `Lockout-Tagout (LOTO) is a <strong>mandatory safety procedure</strong> that ensures all energy sources to equipment are isolated and secured before maintenance begins.<br><br>LOTO prevents accidental re-energisation — the leading cause of electrical fatalities in maintenance work.<br><br>Without LOTO: a colleague starts equipment you're working on. With LOTO: <strong>only you can restore power</strong>.` },
+          { tag: "The 6 Steps", title: "LOTO Procedure Step-by-Step", body: `<ul><li><strong>1. Notify:</strong> Inform all affected employees that the equipment will be de-energised</li><li><strong>2. Identify:</strong> Locate all energy sources (electrical, hydraulic, pneumatic, gravity)</li><li><strong>3. Isolate:</strong> Shut down all energy sources</li><li><strong>4. Lockout:</strong> Apply your personal lock to the energy isolation point</li><li><strong>5. Tagout:</strong> Attach a tag identifying who locked it and when</li><li><strong>6. Verify:</strong> Test to confirm the equipment is fully de-energised before touching</li></ul>` },
+          { tag: "Simple vs Complex", title: "Simple vs Complex LOTO", body: `<ul><li><strong>Simple LOTO:</strong> Single energy source, one person, one lock</li><li><strong>Complex LOTO:</strong> Multiple energy sources, multiple workers — each worker applies their <em>own</em> personal lock</li></ul><div class="key-points"><div class="key-points-title">The Golden Rule</div>In complex LOTO, equipment cannot be re-energised until EVERY lock has been removed by its owner. No supervisor can remove another worker's lock.</div>` }
+        ],
+        quiz: [
+          { q: "In complex LOTO, who can remove a worker's personal lock?", options: ["The site supervisor", "The safety officer", "Only the worker who placed it", "Any qualified electrical worker"], answer: 2, explanation: "Each worker's personal lock can only be removed by that worker. This is the fundamental protection LOTO provides." },
+          { q: "What is Step 6 of the LOTO procedure?", options: ["Notify colleagues", "Apply your lock", "Verify the equipment is de-energised", "Identify energy sources"], answer: 2, explanation: "Verification — testing that the equipment is fully de-energised — is the final step before any work begins." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "road",
+    title: "Road Safety",
+    icon: "🚗",
+    iconBg: "#f3e5f5",
+    duration: "20 min",
+    badge: "Road Warden",
+    description: "Based on AnjouHealth's Road Safety campaign — 102 participants, 97% satisfaction. Covers distracted driving, reaction time, traffic rules, and impairment awareness.",
+    modules: [
+      {
+        id: "road-1", title: "Distracted Driving",
+        sub: "Why multitasking on the road is always dangerous",
+        slides: [
+          { tag: "The Risk", title: "Distraction Is the New Drink Driving", body: `Using a phone while driving increases crash risk by <strong>4×</strong>. Texting while driving takes your eyes off the road for an average of <strong>5 seconds</strong>.<br><br>At 60km/h, 5 seconds of distraction means driving the length of an Olympic swimming pool completely blind.<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">4×</div><div class="stat-block-label">Crash risk increase from phone use</div></div><div class="stat-block"><div class="stat-block-num">5 sec</div><div class="stat-block-label">Average eyes-off-road per text</div></div></div>` },
+          { tag: "Types of Distraction", title: "Three Types of Driving Distraction", body: `<ul><li><strong>Visual distraction:</strong> Eyes off the road (checking phone, looking at GPS)</li><li><strong>Manual distraction:</strong> Hands off the wheel (eating, adjusting radio)</li><li><strong>Cognitive distraction:</strong> Mind off the task (deep conversation, daydreaming)</li></ul><br>Phone use is uniquely dangerous because it causes <strong>all three simultaneously</strong>.` },
+          { tag: "Practical Rules", title: "Your 3 Non-Negotiables", body: `<ul><li><strong>Phone down, always:</strong> Use Do Not Disturb mode. Every notification can wait.</li><li><strong>Pre-trip setup:</strong> Set your GPS, music, and climate before you start moving</li><li><strong>Pull over safely</strong> if you need to make a call — find a safe stopping point, not the shoulder of a highway</li></ul>` }
+        ],
+        quiz: [
+          { q: "By how much does using a phone while driving increase your crash risk?", options: ["2×", "3×", "4×", "10×"], answer: 2, explanation: "Research shows that phone use while driving increases crash risk by 4 times compared to driving without a phone." },
+          { q: "Which type of distraction does phone use cause that makes it uniquely dangerous?", options: ["Visual distraction only", "Manual distraction only", "All three types simultaneously", "Cognitive distraction only"], answer: 2, explanation: "Phone use simultaneously causes visual (eyes off road), manual (hand off wheel), and cognitive (mind off task) distraction." }
+        ]
+      },
+      {
+        id: "road-2", title: "Reaction Time & Impairment",
+        sub: "How fatigue and alcohol affect your ability to respond",
+        slides: [
+          { tag: "Reaction Time", title: "How Fast Can You Actually React?", body: `Average human reaction time to a visual stimulus is <strong>0.25 seconds</strong>. In a car travelling at 60km/h, you travel <strong>4.2 metres</strong> before your brain registers the need to brake.<br><br>Add braking time and total stopping distance reaches <strong>30+ metres</strong> — longer than many drivers estimate.<br><br>Fatigue, alcohol, and distraction all increase reaction time significantly.` },
+          { tag: "Impairment", title: "The Effects of Alcohol & Drowsy Medication", body: `<ul><li><strong>Alcohol at 0.05% BAC</strong> (legal limit in Singapore): Reaction time slows by 15-20%; lane weaving increases</li><li><strong>Alcohol at 0.08% BAC:</strong> Reaction time slows 40%; visual field narrows significantly</li><li><strong>Common medications</strong> (antihistamines, cough syrup): Can impair driving as severely as 0.05% BAC</li></ul><div class="key-points"><div class="key-points-title">Key Rule</div>Check medication labels. "May cause drowsiness" means do not drive.</div>` },
+          { tag: "Fatigue", title: "Driving While Fatigued", body: `Driving after being awake for 18 hours produces impairment equivalent to <strong>0.05% BAC</strong>. After 24 hours awake, impairment reaches <strong>0.10% BAC</strong>.<br><br>Signs you should not be driving:<br><ul><li>Difficulty keeping your eyes open</li><li>Drifting between lanes without noticing</li><li>Missing exits or turns you know well</li><li>Aggressive or impatient behaviour emerging</li></ul>` }
+        ],
+        quiz: [
+          { q: "Driving after 24 hours without sleep produces impairment equivalent to what BAC?", options: ["0.03%", "0.05%", "0.08%", "0.10%"], answer: 3, explanation: "24 hours of sleep deprivation produces cognitive and motor impairment equivalent to a blood alcohol concentration of 0.10%." },
+          { q: "A medication label says 'may cause drowsiness'. What should you do if you need to drive?", options: ["Drive carefully and keep the windows open", "Do not drive — find an alternative", "Take half the dosage", "Only drive short distances"], answer: 1, explanation: "'May cause drowsiness' on a medication label is a clear warning that driving is unsafe. Find alternative transport." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "msk",
+    title: "Musculoskeletal Health",
+    icon: "🦴",
+    iconBg: "#e8f5e9",
+    duration: "20 min",
+    badge: "Body Guard",
+    description: "Based on AnjouHealth's Knee Health campaign — 155 participants, 96% satisfaction. Covers knee conditions, ergonomics, posture, and injury prevention.",
+    modules: [
+      {
+        id: "msk-1", title: "Understanding Knee Health",
+        sub: "Common conditions, symptoms, and risk factors",
+        slides: [
+          { tag: "The Scope", title: "Knee Problems Are a Workplace Issue", body: `Knee injuries and chronic knee conditions are among the top causes of <strong>long-term work incapacity</strong> in Singapore and Taiwan.<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">1 in 4</div><div class="stat-block-label">Workers report regular knee pain</div></div><div class="stat-block"><div class="stat-block-num">3×</div><div class="stat-block-label">Higher risk in physically demanding roles</div></div></div>` },
+          { tag: "Conditions", title: "The Three Most Common Knee Conditions", body: `<ul><li><strong>Osteoarthritis (OA):</strong> Gradual cartilage breakdown — most common in workers over 40. Characterised by morning stiffness and aching after activity.</li><li><strong>Patellofemoral Pain Syndrome (PFPS):</strong> Pain under or around the kneecap — common in workers who kneel, squat, or use stairs frequently.</li><li><strong>ACL Tears:</strong> Ligament damage from sudden direction changes or falls — requiring surgical intervention in many cases.</li></ul>` },
+          { tag: "Prevention", title: "Protecting Your Knees at Work", body: `<ul><li><strong>Never twist at the knee</strong> — pivot with your whole body</li><li><strong>Kneel on knee pads</strong> for any work below knee height lasting more than 2 minutes</li><li><strong>Take load-off breaks:</strong> Alternate between sitting and standing, don't maintain one position for more than 45 minutes</li><li><strong>Strengthen the support muscles:</strong> Quads and hamstrings are the knee's shock absorbers</li></ul>` }
+        ],
+        quiz: [
+          { q: "Which knee condition is most common in workers who frequently kneel or use stairs?", options: ["Osteoarthritis", "Patellofemoral Pain Syndrome", "ACL Tear", "Bursitis"], answer: 1, explanation: "Patellofemoral Pain Syndrome (PFPS) is characterised by pain around the kneecap and is particularly common in those who kneel, squat, or use stairs frequently." },
+          { q: "When kneeling for work lasting more than 2 minutes, what should you always use?", options: ["Ankle support straps", "Knee pads", "A cushioned mat only", "Nothing — kneeling is fine for short periods"], answer: 1, explanation: "Knee pads distribute pressure away from the joint and protect against patellofemoral stress when kneeling for extended periods." }
+        ]
+      },
+      {
+        id: "msk-2", title: "Ergonomics & Posture",
+        sub: "Setting up your workstation and body to prevent injury",
+        slides: [
+          { tag: "Workstation Setup", title: "The Ergonomic Workstation Checklist", body: `<ul><li><strong>Monitor:</strong> Top of screen at or slightly below eye level, arm's length away</li><li><strong>Chair height:</strong> Feet flat on floor, knees at 90°, hips slightly higher than knees</li><li><strong>Keyboard &amp; mouse:</strong> Elbows at 90°, wrists neutral (not bent up or down)</li><li><strong>Lumbar support:</strong> Chair back supporting the natural inward curve of your lower back</li><li><strong>Lighting:</strong> No glare on screen; light source at 90° to your line of sight</li></ul>` },
+          { tag: "Movement", title: "The 20-8-2 Rule", body: `For every 30 minutes at your workstation:<br><br><ul><li><strong>20 minutes</strong> seated in a neutral posture</li><li><strong>8 minutes</strong> standing or doing light activity</li><li><strong>2 minutes</strong> moving — walking, stretching, changing position</li></ul><br>This simple rotation reduces cumulative spinal load by up to <strong>40%</strong> compared to unbroken sitting.<div class="key-points"><div class="key-points-title">Tip</div>Set a recurring 30-minute reminder on your phone or computer. The research is clear: it works.</div>` },
+          { tag: "Self-Care", title: "Foam Rolling & Mobility", body: `Self-myofascial release (foam rolling) before and after physical work:<br><ul><li><strong>IT band and quads</strong> (10 passes each) — reduces knee pain risk</li><li><strong>Hip flexors</strong> — releases lower back tension from prolonged sitting</li><li><strong>Thoracic spine</strong> — improves upper back posture</li></ul><br>2 minutes of targeted rolling at the start and end of a shift makes a measurable difference over weeks.` }
+        ],
+        quiz: [
+          { q: "In the 20-8-2 rule, what does the '2' represent?", options: ["2 hours of standing", "2 minutes of movement per 30-minute cycle", "2 screen breaks per hour", "2 minutes of sitting"], answer: 1, explanation: "The 20-8-2 rule recommends 2 minutes of movement (walking, stretching) for every 30-minute work cycle at your workstation." },
+          { q: "Where should the top of your monitor screen be positioned relative to your eyes?", options: ["Well above eye level to avoid slouching", "At or slightly below eye level", "At chin height", "As far away as possible"], answer: 1, explanation: "Monitor top at or slightly below eye level ensures a neutral neck position and reduces upper back and neck strain." }
+        ]
+      }
+    ]
+  }
+  ,
+  // ─── NEW COURSES FROM 2023–2026 CAMPAIGNS ───────────────────────────────────
+  {
+    id: "air",
+    title: "Air Hygiene & Heart Health",
+    icon: "💚",
+    iconBg: "#e0f7fa",
+    duration: "22 min",
+    badge: "Heart Champion",
+    description: "Based on AnjouHealth's Air Hygiene & Heart Health campaign (Oct 2023). Covers cardiovascular health fundamentals, VO₂max fitness testing, and how to create a cleaner, healthier indoor environment.",
+    modules: [
+      {
+        id: "air-1", title: "Cardiovascular Health at Work",
+        sub: "Why your heart is your most important safety tool",
+        slides: [
+          { tag: "Why It Matters", title: "Your Heart Is a Workplace Asset", body: `Cardiovascular disease is the leading cause of death in Singapore and a growing concern in workplace wellness. Maintaining heart health isn't just a personal goal — it directly affects your alertness, reaction time, and ability to perform safely at work.<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">1 in 3</div><div class="stat-block-label">Deaths in Singapore are cardiovascular in origin</div></div><div class="stat-block"><div class="stat-block-num">30%</div><div class="stat-block-label">Of cardiac events are linked to workplace stress</div></div></div>` },
+          { tag: "VO₂max", title: "Understanding Your Cardiovascular Fitness", body: `VO₂max is the maximum volume of oxygen your body can use during intense exercise — a key marker of cardiovascular fitness.<br><br><ul><li><strong>High VO₂max:</strong> Better stamina, faster recovery, stronger heart</li><li><strong>Low VO₂max:</strong> Greater fatigue risk, slower response under physical stress</li><li><strong>Improvement:</strong> Even 20–30 minutes of moderate aerobic activity 3× per week can raise your VO₂max significantly</li></ul><div class="key-points"><div class="key-points-title">Tip</div>You don't need lab testing — a brisk 12-minute walk-run test (Cooper Test) gives a reliable estimate of your VO₂max category.</div>` },
+          { tag: "Risk Factors", title: "Workplace Heart Health Risk Factors", body: `Common workplace habits that elevate cardiovascular risk:<br><ul><li><strong>Prolonged sitting:</strong> Increases blood clot risk even for those who exercise regularly</li><li><strong>High-salt diets</strong> (canteen meals, hawker food): Raises blood pressure</li><li><strong>Chronic work stress:</strong> Elevates cortisol and adrenaline, hardening arteries over time</li><li><strong>Sleep deprivation:</strong> Less than 6 hours per night doubles heart attack risk vs. 7–8 hours</li></ul>` }
+        ],
+        quiz: [
+          { q: "What does VO₂max measure?", options: ["Maximum heart rate per minute", "The maximum oxygen volume your body uses during intense exercise", "Resting blood pressure", "Lung capacity in litres"], answer: 1, explanation: "VO₂max measures your body's maximum ability to consume oxygen during high-intensity exercise — a key indicator of cardiovascular fitness." },
+          { q: "Which of the following is a cardiovascular risk factor even for people who exercise regularly?", options: ["Occasional overtime", "Prolonged daily sitting", "Moderate caffeine intake", "Working in air-conditioned environments"], answer: 1, explanation: "Prolonged sitting increases blood clot risk and cardiovascular stress even in people who exercise, making regular movement breaks essential." }
+        ]
+      },
+      {
+        id: "air-2", title: "Air Quality & Indoor Environments",
+        sub: "Protecting yourself from invisible indoor air hazards",
+        slides: [
+          { tag: "Indoor Pollutants", title: "What's In the Air You Breathe at Work", body: `Indoor air can be 2–5× more polluted than outdoor air. Common pollutants in workplace environments:<br><ul><li><strong>VOCs (Volatile Organic Compounds):</strong> Emitted by printers, cleaning products, furniture</li><li><strong>Particulate Matter (PM2.5):</strong> Fine particles that penetrate deep into lungs — from dust, copiers, cooking areas</li><li><strong>Carbon dioxide (CO₂) build-up:</strong> Poorly ventilated rooms accumulate CO₂, causing fatigue and reduced concentration</li><li><strong>Mould spores:</strong> Found in damp ceiling tiles, carpets, and poorly maintained AC systems</li></ul>` },
+          { tag: "Health Impact", title: "How Poor Air Quality Affects Performance", body: `Studies show that cognitive performance drops significantly in poorly ventilated spaces:<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">−61%</div><div class="stat-block-label">Decrease in decision-making ability in high-CO₂ environments</div></div><div class="stat-block"><div class="stat-block-num">2–5×</div><div class="stat-block-label">Higher indoor vs. outdoor pollution levels on average</div></div></div><br>Symptoms of poor air quality: headaches, eye irritation, fatigue, difficulty concentrating, and worsened allergy symptoms.` },
+          { tag: "Taking Action", title: "Creating a Cleaner Indoor Environment", body: `Practical steps you can take or advocate for:<br><ul><li><strong>Open windows when possible</strong> — even 10 minutes of fresh air exchange helps significantly</li><li><strong>Place air-purifying plants</strong> near workstations (snake plant, peace lily)</li><li><strong>Report damp spots or mould</strong> to facilities immediately — do not leave them</li><li><strong>Advocate for regular AC filter servicing</strong> — recommend quarterly checks minimum</li><li><strong>Take outdoor breaks</strong> during the day to refresh your respiratory system</li></ul>` }
+        ],
+        quiz: [
+          { q: "Compared to outdoor air, indoor workplace air quality is typically:", options: ["About the same", "Cleaner and safer", "2–5 times more polluted on average", "Less of a concern in modern buildings"], answer: 2, explanation: "Studies consistently show indoor air can be 2–5× more polluted than outdoor air due to VOCs, CO₂ build-up, and poor ventilation." },
+          { q: "Which symptom is commonly associated with high CO₂ build-up in poorly ventilated rooms?", options: ["Increased alertness", "Fatigue and difficulty concentrating", "Skin irritation", "Faster heart rate"], answer: 1, explanation: "Elevated CO₂ from poor ventilation causes fatigue, headaches, and reduced cognitive performance — a significant safety and productivity issue." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "chem",
+    title: "Chemical Safety",
+    icon: "⚗️",
+    iconBg: "#fffde7",
+    duration: "25 min",
+    badge: "Safety Chemist",
+    description: "Based on AnjouHealth's Chemical Safety campaign (Nov 2023). Covers hazardous materials awareness, reading Safety Data Sheets, and best practices for safe chemical handling at workplace environments.",
+    modules: [
+      {
+        id: "chem-1", title: "Hazardous Materials Awareness",
+        sub: "Identifying and understanding chemical hazards around you",
+        slides: [
+          { tag: "What Is a Hazardous Material?", title: "Not All Chemicals Are Obvious Dangers", body: `A hazardous material is any substance that poses a risk to health, safety, or the environment. In data centres and workplaces, hazardous materials include:<br><ul><li><strong>Cleaning agents:</strong> Degreasers, solvents, bleach-based products</li><li><strong>Battery electrolytes:</strong> Sulphuric acid in UPS systems</li><li><strong>Refrigerants:</strong> In HVAC and cooling systems</li><li><strong>Fire suppression agents:</strong> CO₂ and FM200 systems</li><li><strong>Aerosols:</strong> Lubricants, compressed air cans</li></ul>` },
+          { tag: "GHS Labels", title: "Reading Chemical Labels: The GHS System", body: `The Globally Harmonised System (GHS) standardises chemical labelling worldwide. Every chemical container must display:<br><ul><li><strong>Product identifier:</strong> Chemical name and concentration</li><li><strong>Signal word:</strong> "Danger" (more severe) or "Warning" (less severe)</li><li><strong>Hazard pictograms:</strong> 9 internationally recognised icons (flame, skull, corrosion, etc.)</li><li><strong>Hazard statements:</strong> Specific nature of the hazard (e.g. "Causes severe skin burns")</li><li><strong>Precautionary statements:</strong> Safe handling instructions</li></ul><div class="key-points"><div class="key-points-title">Rule</div>Never use an unlabelled chemical. If the label is missing or damaged, treat it as unknown and report immediately.</div>` },
+          { tag: "Routes of Exposure", title: "How Chemicals Enter the Body", body: `Understanding exposure routes is critical for protection:<br><ul><li><strong>Inhalation (most common):</strong> Vapours, fumes, and mists — the fastest route to blood and organs</li><li><strong>Skin contact:</strong> Many chemicals absorb through skin, especially if gloves are not worn</li><li><strong>Ingestion:</strong> Transferred from contaminated hands to mouth — always wash hands before eating</li><li><strong>Eye contact:</strong> Splash risk from liquids — safety glasses are essential</li></ul>` }
+        ],
+        quiz: [
+          { q: "What does the signal word 'DANGER' on a GHS label indicate compared to 'WARNING'?", options: ["They mean the same thing", "DANGER indicates a more severe hazard category", "WARNING indicates a more severe hazard category", "DANGER only applies to flammable substances"], answer: 1, explanation: "Under the GHS system, 'DANGER' is used for more severe hazard categories, while 'WARNING' is used for less severe hazards. Both require attention and appropriate precautions." },
+          { q: "Which exposure route is considered most common and fastest in chemical hazard situations?", options: ["Skin contact", "Eye contact", "Inhalation", "Ingestion"], answer: 2, explanation: "Inhalation is the most common exposure route — vapours, fumes, and mists are quickly absorbed into the bloodstream through the lungs." }
+        ]
+      },
+      {
+        id: "chem-2", title: "Reading Safety Data Sheets",
+        sub: "The 16-section guide to every chemical you work with",
+        slides: [
+          { tag: "What Is an SDS?", title: "Your Chemical's Full Safety Manual", body: `A Safety Data Sheet (SDS) is a standardised document provided by chemical manufacturers containing comprehensive hazard and safety information. Every chemical in your workplace must have an SDS accessible to workers.<br><br>The SDS has <strong>16 standardised sections</strong> covering everything from composition to disposal requirements.` },
+          { tag: "Key Sections", title: "The 5 SDS Sections You Must Know", body: `<ul><li><strong>Section 2 — Hazard Identification:</strong> Classification, signal word, and hazard statements</li><li><strong>Section 4 — First Aid Measures:</strong> Immediate actions for each exposure route (inhale, skin, eyes, ingestion)</li><li><strong>Section 6 — Accidental Release:</strong> Spill containment and clean-up procedures</li><li><strong>Section 8 — Exposure Controls/PPE:</strong> Ventilation requirements and required protective equipment</li><li><strong>Section 13 — Disposal:</strong> Legal disposal methods — never pour chemicals down drains without checking</li></ul>` },
+          { tag: "SDS in Practice", title: "Finding and Using the SDS at Work", body: `<ul><li>SDS must be <strong>readily accessible</strong> — not locked away or requiring supervisor permission to view</li><li>Before using a new chemical, check SDS Section 8 to confirm your PPE is adequate</li><li>If a chemical enters your eyes or skin, check SDS Section 4 — the first aid varies significantly between substances</li><li>In Singapore, employers must maintain an <strong>inventory of all hazardous substances</strong> and ensure SDS currency (updated every 5 years minimum)</li></ul><div class="key-points"><div class="key-points-title">Key Rule</div>An SDS older than 5 years may have outdated hazard classifications. Check the revision date on the document.</div>` }
+        ],
+        quiz: [
+          { q: "Which SDS section tells you what PPE to wear and what ventilation is required?", options: ["Section 2", "Section 4", "Section 8", "Section 13"], answer: 2, explanation: "Section 8 (Exposure Controls/Personal Protection) specifies required ventilation, exposure limits, and PPE for safe handling of the chemical." },
+          { q: "A colleague is splashed by an unknown chemical. What should you check immediately?", options: ["Section 13 of the SDS for disposal", "Section 4 of the SDS for first aid measures", "Section 1 for the product name only", "The product label only — SDS is not needed"], answer: 1, explanation: "Section 4 (First Aid Measures) provides immediate response steps for each exposure route — this is the first section to consult after a chemical exposure incident." }
+        ]
+      },
+      {
+        id: "chem-3", title: "Safe Chemical Handling & Storage",
+        sub: "Practical procedures for working with hazardous substances",
+        slides: [
+          { tag: "Before You Start", title: "The Pre-Task Chemical Safety Check", body: `Before handling any chemical:<br><ol><li><strong>Check the SDS</strong> — confirm the hazard class and PPE required</li><li><strong>Inspect the container</strong> — label intact, no damage, no leaks</li><li><strong>Check your PPE</strong> — correct gloves for the substance, eye protection, face shield if splash risk</li><li><strong>Confirm ventilation</strong> — never use solvents or aerosols in enclosed spaces without proper airflow</li><li><strong>Know your emergency response</strong> — locate the eyewash station and spill kit before starting</li></ol>` },
+          { tag: "Safe Storage", title: "Chemical Segregation Principles", body: `Chemicals must be stored by <strong>compatibility class</strong> — never by size or alphabetical order.<br><ul><li><strong>Flammables</strong> separate from <strong>oxidisers</strong> — an oxidiser next to a flammable is a fire waiting to happen</li><li><strong>Acids</strong> separate from <strong>bases</strong> — a corrosive reaction if mixed</li><li><strong>Compressed gas cylinders</strong> must be chained and capped at all times</li><li>Never store chemicals above eye level — you cannot safely read labels or handle containers at height</li></ul>` },
+          { tag: "Disposal", title: "Chemical Disposal — Never Improvise", body: `Improper chemical disposal is both a safety hazard and a legal violation in Singapore.<br><ul><li><strong>Never pour chemicals down the drain</strong> unless SDS Section 13 explicitly permits it</li><li>Use designated <strong>chemical waste containers</strong> — label them correctly</li><li>Contact your <strong>approved waste contractor</strong> for scheduled collection</li></ul><div class="key-points"><div class="key-points-title">Singapore Law</div>Under the Environmental Protection and Management Act (EPMA), improper hazardous waste disposal can result in fines up to S$50,000 for first offences.</div>` }
+        ],
+        quiz: [
+          { q: "Which storage rule is most critical for preventing chemical reactions?", options: ["Store by container size for easy access", "Store alphabetically for quick identification", "Segregate by compatibility class, not convenience", "Store all liquids on lower shelves only"], answer: 2, explanation: "Chemical segregation by compatibility class prevents dangerous reactions between incompatible substances like acids/bases or flammables/oxidisers." },
+          { q: "What is the correct way to dispose of most hazardous chemicals in the workplace?", options: ["Pour down the sink — water dilutes them", "Mix with other waste chemicals to neutralise", "Contact your approved chemical waste contractor", "Leave them to evaporate in a ventilated area"], answer: 2, explanation: "Hazardous chemicals must be disposed through licensed waste contractors. Pouring chemicals down drains or attempting amateur neutralisation is illegal and dangerous." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "heat",
+    title: "Heat Stress",
+    icon: "🌡️",
+    iconBg: "#fff3e0",
+    duration: "20 min",
+    badge: "Cool Head",
+    description: "Based on AnjouHealth's Heat Stress campaign (May 2024). Covers recognising and managing heat and cold stress, using WBGT measurements, and first aid for hyperthermia and hypothermia.",
+    modules: [
+      {
+        id: "heat-1", title: "Heat Stress Recognition & Prevention",
+        sub: "Understanding heat illness before it becomes an emergency",
+        slides: [
+          { tag: "The Physiology", title: "How Heat Affects Your Body at Work", body: `In outdoor or high-heat environments, your body works constantly to cool itself — but this system can be overwhelmed. When core body temperature rises above 38°C, performance degrades. Above 40°C, heat stroke becomes life-threatening.<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">38°C</div><div class="stat-block-label">Core temperature where performance begins to drop</div></div><div class="stat-block"><div class="stat-block-num">40°C+</div><div class="stat-block-label">Heat stroke threshold — a medical emergency</div></div></div>` },
+          { tag: "WBGT", title: "The Wet Bulb Globe Temperature (WBGT)", body: `WBGT is the standard measurement for heat stress risk in occupational settings. Unlike simple air temperature, WBGT accounts for humidity, radiant heat, and air movement.<br><br><strong>Singapore WBGT work-rest guidelines:</strong><br><ul><li>WBGT 25–27°C: Light work, 75% work / 25% rest</li><li>WBGT 28–30°C: Moderate work, 50% work / 50% rest</li><li>WBGT 30°C+: Suspend heavy physical work outdoors</li></ul>` },
+          { tag: "Heat Illness Spectrum", title: "From Heat Cramps to Heat Stroke", body: `Heat illness progresses through stages:<br><ul><li><strong>Heat cramps:</strong> Muscle spasms — move to shade, drink electrolytes</li><li><strong>Heat exhaustion:</strong> Heavy sweating, weakness, pale skin, fast weak pulse — move to cool area, apply cool wet cloths</li><li><strong>Heat stroke:</strong> High body temp (40°C+), hot/red skin, rapid strong pulse, possible unconsciousness — <strong>call 995 immediately, begin cooling</strong></li></ul><div class="key-points"><div class="key-points-title">Critical Rule</div>Heat stroke is a life-threatening emergency. Do not wait for improvement — call 995 and begin cooling immediately.</div>` }
+        ],
+        quiz: [
+          { q: "What does WBGT measure that simple air temperature does not?", options: ["Only air temperature in the shade", "Temperature, humidity, radiant heat, and air movement combined", "UV radiation levels only", "Ground surface temperature"], answer: 1, explanation: "WBGT combines air temperature, humidity, radiant heat, and air movement — giving a more accurate picture of heat stress risk than air temperature alone." },
+          { q: "A worker shows signs of heat stroke: hot red skin, rapid strong pulse, and confusion. What is the FIRST action?", options: ["Give cold water and wait 10 minutes", "Call 995 immediately and begin cooling the person", "Provide a rest break in shade", "Apply heat rub to the legs"], answer: 1, explanation: "Heat stroke is a medical emergency — call 995 immediately and apply cold water or ice while waiting for emergency services." }
+        ]
+      },
+      {
+        id: "heat-2", title: "Cold Stress & Temperature Extremes",
+        sub: "Recognising and responding to cold-related illness",
+        slides: [
+          { tag: "Cold Stress at Work", title: "When Cold Environments Become Dangerous", body: `Cold stress occurs when the body cannot maintain its core temperature. Risk increases below 10°C and in wet or windy conditions — common in cold storage facilities, outdoor night work, and data centre cold aisles.<br><br>Cold stress is often underestimated in Singapore due to the warm climate — workers are frequently underprepared for cold-aisle DC work or overseas winter travel.` },
+          { tag: "Hypothermia", title: "Recognising Hypothermia", body: `Hypothermia occurs when body temperature falls below 35°C. Stages:<br><ul><li><strong>Mild (32–35°C):</strong> Shivering, numbness, slurred speech</li><li><strong>Moderate (28–32°C):</strong> Shivering stops (danger sign), confusion, drowsiness</li><li><strong>Severe (below 28°C):</strong> Unconsciousness, cardiac arrest risk</li></ul><div class="key-points"><div class="key-points-title">Warning Sign</div>When shivering stops in a cold environment, it is a medical emergency — the body can no longer self-warm. Seek help immediately.</div>` },
+          { tag: "Prevention & First Aid", title: "Staying Safe in Cold Environments", body: `Prevention:<br><ul><li>Layer clothing — base layer, insulating mid-layer, wind-breaking outer layer</li><li>Stay dry — wet clothing conducts heat away 25× faster than dry clothing</li><li>Take regular warm breaks in heated areas</li></ul><br>First aid:<br><ul><li>Move to a warm, dry environment</li><li>Remove wet clothing; apply warm blankets to trunk first</li><li>Do not rub limbs — this warms extremities before core, worsening the condition</li><li>Call 995 for moderate or severe hypothermia</li></ul>` }
+        ],
+        quiz: [
+          { q: "A worker shivering intensely in a cold aisle has suddenly stopped shivering. What does this indicate?", options: ["They are warming up and recovering", "The environment is no longer cold", "A danger sign — their body can no longer self-warm", "They need exercise to warm up"], answer: 2, explanation: "Cessation of shivering is a serious warning sign of moderate hypothermia — the body has lost its ability to self-warm, requiring immediate medical attention." },
+          { q: "Why should you NOT rub the limbs of a person with hypothermia?", options: ["It causes muscle cramps", "It warms extremities before the core, worsening the condition", "It increases pain", "It lowers blood pressure"], answer: 1, explanation: "Rubbing extremities first warms peripheral blood that then flows to the core, causing a dangerous drop in core temperature — prioritise warming the trunk." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "energy",
+    title: "Energy Wheel & Hazard ID",
+    icon: "⚙️",
+    iconBg: "#e3f2fd",
+    duration: "22 min",
+    badge: "Hazard Hunter Pro",
+    description: "Based on AnjouHealth's Energy Wheel campaign (Jul 2024). Covers the 10 hazardous energy sources and how to identify visible, hidden, and transient hazards — with a data centre focus.",
+    modules: [
+      {
+        id: "energy-1", title: "The 10 Energy Sources",
+        sub: "Recognising every form of hazardous energy in the workplace",
+        slides: [
+          { tag: "Why Energy Sources Matter", title: "Every Workplace Injury Has an Energy Source", body: `Behind every workplace incident is a form of energy that was not properly controlled. Understanding energy types is the foundation of hazard identification — if you can't name the energy, you can't control it.<br><br>The Energy Wheel categorises <strong>10 distinct hazardous energy sources</strong> that workers encounter across all industries.` },
+          { tag: "Energy Sources 1–5", title: "The Energy Wheel: First Five", body: `<ul><li><strong>1. Electrical:</strong> Shock, arc flash, electrostatic discharge</li><li><strong>2. Mechanical:</strong> Moving parts, rotating machinery, stored spring tension</li><li><strong>3. Pneumatic:</strong> Compressed air — can inject into skin or rapidly eject components</li><li><strong>4. Hydraulic:</strong> High-pressure fluid — pressurised lines cause injection injuries</li><li><strong>5. Chemical:</strong> Reactive, flammable, or toxic substances</li></ul>` },
+          { tag: "Energy Sources 6–10", title: "The Energy Wheel: Final Five", body: `<ul><li><strong>6. Thermal:</strong> Heat from steam, hot surfaces, or cryogenic cold</li><li><strong>7. Gravitational:</strong> Objects at height, suspended loads</li><li><strong>8. Biological:</strong> Pathogens, sharps, biological waste</li><li><strong>9. Radiation:</strong> UV, infrared, laser, ionising radiation</li><li><strong>10. Acoustic:</strong> Noise — invisible and cumulative, causing permanent hearing loss</li></ul><div class="key-points"><div class="key-points-title">Apply It</div>Before any task, mentally check: which of these 10 energy sources are present, and which ones have you controlled?</div>` }
+        ],
+        quiz: [
+          { q: "A pressurised air line ruptures during maintenance. Which energy source does this represent?", options: ["Electrical", "Hydraulic", "Pneumatic", "Mechanical"], answer: 2, explanation: "Compressed air is a pneumatic energy source. A ruptured line can cause severe injection injuries or rapid projectile ejection." },
+          { q: "Which energy source causes cumulative damage over time without any single obvious incident?", options: ["Gravitational", "Acoustic (noise)", "Chemical", "Thermal"], answer: 1, explanation: "Acoustic energy causes noise-induced hearing loss that accumulates gradually — workers often don't notice the damage until it is irreversible." }
+        ]
+      },
+      {
+        id: "energy-2", title: "Visible, Hidden & Transient Hazards",
+        sub: "Finding hazards that don't announce themselves",
+        slides: [
+          { tag: "Three Hazard Categories", title: "Not All Hazards Are Obvious", body: `The Energy Wheel framework classifies three hazard types:<br><ul><li><strong>Visible hazards:</strong> Immediately apparent — a wet floor, an open panel, a broken cable</li><li><strong>Hidden hazards:</strong> Concealed by design or location — a pressurised line behind a panel, a buried electrical cable</li><li><strong>Transient hazards:</strong> Only present under specific conditions — a surface that is only hot during certain processes, or a zone accessible only when a door is open</li></ul>` },
+          { tag: "DC-Specific Examples", title: "Hidden Hazards in Data Centres", body: `Data centres contain numerous hidden hazards requiring experienced pattern recognition:<br><ul><li><strong>Under-floor spaces:</strong> Power cables degrade unseen; water accumulates from CRAC units</li><li><strong>UPS battery rooms:</strong> Hydrogen build-up during charging — explosion risk in enclosed spaces</li><li><strong>CRAC/CRAH units:</strong> Refrigerant leaks displace oxygen — silent asphyxiation risk</li><li><strong>Ceiling voids:</strong> Old conduit and deteriorating insulation hidden above suspended ceilings</li></ul>` },
+          { tag: "The Process", title: "A Systematic Hazard Identification Sequence", body: `Before any task:<br><ol><li><strong>Pause and look:</strong> Full scan — floor, walls, ceiling, equipment in zone</li><li><strong>Run the Energy Wheel:</strong> Which of the 10 sources are present or could become active?</li><li><strong>Check for hidden hazards:</strong> What is behind panels, under floors, inside ducts?</li><li><strong>Check for transient conditions:</strong> Is anything different when systems are under load vs. idle?</li><li><strong>Report and act:</strong> Tag out or notify before proceeding</li></ol>` }
+        ],
+        quiz: [
+          { q: "Which hazard type is only present under specific operating conditions?", options: ["Visible hazard", "Hidden hazard", "Transient hazard", "Residual hazard"], answer: 2, explanation: "Transient hazards exist only under specific conditions — for example, a surface only dangerously hot when a process is running." },
+          { q: "What is the first step in the Energy Wheel hazard identification sequence?", options: ["Run the full Energy Wheel checklist", "Pause and do a full environmental scan of the area", "Notify your supervisor of your plan", "Check the SDS of any chemicals in the area"], answer: 1, explanation: "The first step is always to pause and conduct a full environmental scan before applying any systematic framework." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sustainability",
+    title: "Sustainability & 3Rs",
+    icon: "♻️",
+    iconBg: "#e8f5e9",
+    duration: "18 min",
+    badge: "Eco Guardian",
+    description: "Based on AnjouHealth's 3Rs Sustainability campaign (Sep 2024). Covers waste reduction, recycling, e-waste management, composting, and upcycling in workplace and data centre contexts.",
+    modules: [
+      {
+        id: "sust-1", title: "The 3Rs Framework",
+        sub: "Reduce, Reuse, Recycle — in that priority order",
+        slides: [
+          { tag: "Why Order Matters", title: "Reduce First — Always", body: `The 3Rs are a hierarchy, not equals:<br><ul><li><strong>1. Reduce (most effective):</strong> The best waste is the waste never created. Reducing consumption eliminates the environmental cost entirely.</li><li><strong>2. Reuse:</strong> Using items multiple times before discarding extends product life and reduces replacement demand.</li><li><strong>3. Recycle (least effective of the three):</strong> Still valuable — but recycling uses energy, water, and transport. A last resort, not a first option.</li></ul>` },
+          { tag: "Singapore Context", title: "Singapore's Waste Challenge", body: `Singapore's land scarcity makes waste management a national priority:<br><br><div class="stat-row"><div class="stat-block"><div class="stat-block-num">2035</div><div class="stat-block-label">Estimated year Semakau Landfill reaches capacity</div></div><div class="stat-block"><div class="stat-block-num">30%</div><div class="stat-block-label">Targeted reduction in landfill waste by 2030 (Zero Waste Masterplan)</div></div></div>` },
+          { tag: "Recycling Basics", title: "What Can and Cannot Be Recycled", body: `The most common recycling mistakes:<br><ul><li><strong>❌ Food-contaminated containers</strong> — contaminates entire batches of paper recyclables</li><li><strong>❌ Plastic bags in recycling bins</strong> — jams sorting machinery</li><li><strong>❌ Styrofoam</strong> — not accepted in Singapore's recycling stream</li><li><strong>✓ Clean paper, cardboard, glass bottles, aluminium cans, rigid plastics</strong></li></ul><div class="key-points"><div class="key-points-title">Rule</div>When in doubt, throw it out. Contaminating recyclables is worse than placing them in general waste.</div>` }
+        ],
+        quiz: [
+          { q: "Why is 'Reduce' considered the most effective of the 3Rs?", options: ["It is cheapest", "It eliminates waste before it is created — no disposal or recycling cost", "It requires the least effort", "Singapore law mandates it first"], answer: 1, explanation: "Reducing consumption eliminates the entire lifecycle impact of a product — no waste to reuse, recycle, transport, or dispose of." },
+          { q: "Which item should NOT be placed in a recycling bin?", options: ["Clean aluminium cans", "Clean glass bottles", "Food-contaminated cardboard", "Dry rigid plastic containers"], answer: 2, explanation: "Food-contaminated cardboard ruins entire batches of recyclables — contaminated materials end up in general waste regardless." }
+        ]
+      },
+      {
+        id: "sust-2", title: "E-Waste, Composting & Upcycling",
+        sub: "Advanced waste streams and creative material recovery",
+        slides: [
+          { tag: "E-Waste", title: "The E-Waste Problem", body: `Electronic waste is one of the fastest-growing waste streams globally. It contains both <strong>valuable recoverable materials</strong> and <strong>hazardous substances</strong>:<br><ul><li><strong>Valuable:</strong> Gold, silver, copper, palladium — recoverable through proper processing</li><li><strong>Hazardous:</strong> Lead, mercury, cadmium — toxic to soil and groundwater if landfilled</li></ul><br>Singapore's NEA regulated e-waste recycling scheme covers laptops, phones, TVs, and appliances. Drop-off points are at all major retail outlets.` },
+          { tag: "Composting", title: "Turning Food Waste Into a Resource", body: `Food waste represents <strong>11% of Singapore's total waste</strong> by weight. Composting converts organic waste into soil amendment — eliminating it from the waste stream entirely.<br><br><strong>Can compost:</strong> Fruit/vegetable scraps, coffee grounds, eggshells, dry leaves<br><strong>Cannot compost:</strong> Meat, dairy, oily food — these attract pests<br><br>The campaign featured <strong>DIY Eco Enzymes</strong> made from citrus peels, sugar, and water — a natural cleaner made from kitchen waste.` },
+          { tag: "Upcycling", title: "Creating Value From Waste", body: `Upcycling transforms waste into products of equal or greater value — going beyond recycling:<br><ul><li>Repurposed fabric scraps → tote bags</li><li>Used newspaper → origami packaging</li><li>Glass jars → plant holders or storage</li></ul><br>In the workplace:<br><ul><li>Reuse packaging for internal shipments before ordering new materials</li><li>Donate functional equipment — request IT asset transfer before e-waste disposal</li></ul>` }
+        ],
+        quiz: [
+          { q: "Why is e-waste more hazardous than general waste in landfills?", options: ["It is heavier", "It contains toxic substances like lead and mercury that leach into soil", "It produces more CO₂", "It cannot be compacted"], answer: 1, explanation: "E-waste contains hazardous materials including lead, mercury, and cadmium that leach into soil and groundwater in landfills." },
+          { q: "What percentage of Singapore's total waste does food waste represent?", options: ["2%", "5%", "11%", "25%"], answer: 2, explanation: "Food waste makes up approximately 11% of Singapore's total waste by weight — a significant target for reduction through composting programmes." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "assailant",
+    title: "Active Assailant & Trauma Response",
+    icon: "🛡️",
+    iconBg: "#fce4ec",
+    duration: "30 min",
+    badge: "Crisis Ready",
+    description: "Based on AnjouHealth's Active Assailant & Trauma Response campaign (Mar 2026). Covers threat recognition, the four trauma response types, emergency first aid, and personal safety principles.",
+    modules: [
+      {
+        id: "aat-1", title: "Threat Recognition",
+        sub: "Recognising warning signs before an incident escalates",
+        slides: [
+          { tag: "The Reality", title: "Why Threat Awareness Matters", body: `Violent incidents in public spaces — including workplaces — are an increasing global safety concern. Key insight: <strong>most violent incidents show observable warning signs before escalation</strong>. Training your awareness of pre-incident behaviours is the single most effective preventive measure.<br><br>The Run. Hide. Fight. protocol combined with early threat recognition has been shown to significantly reduce casualties in active assailant events.` },
+          { tag: "Pre-Incident Indicators", title: "What to Look for Before an Incident", body: `Research on workplace violence shows consistent pre-incident indicators:<br><ul><li><strong>Unusual nervousness:</strong> Excessive scanning, avoidance of eye contact, fidgeting</li><li><strong>Inappropriate attire:</strong> Layered or concealing clothing in warm conditions</li><li><strong>Out-of-place behaviour:</strong> Photographing security infrastructure or pacing restricted areas</li><li><strong>Verbal escalation:</strong> Raised voice or threats — even coded ones</li><li><strong>Personal boundary violations:</strong> Deliberately blocking exits or invading personal space</li></ul>` },
+          { tag: "Environmental Scan", title: "The 5-Second Safety Scan", body: `A trained environmental scan takes only 5 seconds:<br><ol><li><strong>Exits:</strong> Where are the exits? Are any blocked or unusually attended?</li><li><strong>Crowd behaviour:</strong> Is anyone behaving unusually for this context?</li><li><strong>Objects:</strong> Anything left unattended or out of place?</li><li><strong>Emotional environment:</strong> Is there unusual tension or active conflict?</li></ol><div class="key-points"><div class="key-points-title">Trust Your Instinct</div>If something feels wrong, it often is. Leave, alert, or call — based on your assessment of the threat level.</div>` }
+        ],
+        quiz: [
+          { q: "What is the most effective preventive measure in an active assailant scenario?", options: ["Carrying self-defence tools", "Training awareness of pre-incident behaviours", "Knowing your building security team", "Having an emergency exit plan only"], answer: 1, explanation: "Research consistently shows that most violent incidents show observable pre-incident indicators. Recognising these early is more effective than reactive measures alone." },
+          { q: "Which behaviour would most likely indicate a pre-incident threat in a workplace?", options: ["An unfamiliar visitor signing in at reception", "Someone photographing security cameras or access points", "A colleague speaking loudly on the phone", "Someone arriving early for a meeting"], answer: 1, explanation: "Photographing security infrastructure suggests surveillance of access points — inconsistent with legitimate visitor behaviour and a significant pre-incident indicator." }
+        ]
+      },
+      {
+        id: "aat-2", title: "Trauma Response Types",
+        sub: "Understanding how people react under extreme stress",
+        slides: [
+          { tag: "The Four Responses", title: "Fight, Flight, Freeze & Fawn", body: `Under extreme threat, the body triggers automatic stress responses. Understanding yours helps you mentally prepare:<br><ul><li><strong>Fight:</strong> Confrontation and active resistance — appropriate as a last resort</li><li><strong>Flight:</strong> Immediate escape — the safest option when physically possible</li><li><strong>Freeze:</strong> Paralysis — common and dangerous in crisis; training can help override this</li><li><strong>Fawn:</strong> Appeasement — attempting to placate the threat; often unconscious</li></ul>` },
+          { tag: "Overriding Freeze", title: "Why Training Reduces Freezing", body: `Freeze response is the most dangerous in an active assailant scenario. Studies of survivors show:<br><ul><li>People with <strong>prior training and mental rehearsal</strong> freeze far less often</li><li>Pre-decided actions ("if X happens, I will Y") activate automatically under stress</li><li>Knowing your nearest exit takes 2 seconds — in an emergency, it saves critical minutes</li></ul><div class="key-points"><div class="key-points-title">Mental Rehearsal</div>When entering a new building, take 5 seconds to identify the exits. This simple habit significantly reduces freeze response time.</div>` },
+          { tag: "First Aid Basics", title: "Immediate Trauma Response: Open Wounds", body: `In a trauma situation, you may need to provide first aid before emergency services arrive:<br><ol><li><strong>Ensure scene safety first</strong> — never put yourself at risk</li><li><strong>Apply direct pressure</strong> — use a clean cloth; press firmly and maintain</li><li><strong>Do not remove an embedded object</strong> — stabilise it in place; removal causes rapid blood loss</li><li><strong>Elevate the injured limb</strong> if possible — reduces blood pressure at the wound site</li><li><strong>Call 995</strong> — provide location, number of casualties, and nature of injuries</li></ol>` }
+        ],
+        quiz: [
+          { q: "Which trauma response is typically most dangerous in an active assailant scenario?", options: ["Fight", "Flight", "Freeze", "Fawn"], answer: 2, explanation: "The freeze response stops people from taking protective action. Training and mental rehearsal are the most effective ways to reduce freezing." },
+          { q: "When treating an open wound with an embedded object, what should you do?", options: ["Remove it to stop bleeding", "Stabilise it in place — do not remove it", "Apply pressure directly on top of the object", "Ignore it and focus on other injuries first"], answer: 1, explanation: "Removing an embedded object can cause sudden, rapid blood loss. Stabilise it in place, apply pressure around it, and await emergency services." }
+        ]
+      },
+      {
+        id: "aat-3", title: "Personal Safety & Run-Hide-Fight",
+        sub: "The internationally recognised active assailant response protocol",
+        slides: [
+          { tag: "The Protocol", title: "Run. Hide. Fight. — In That Order", body: `<ul><li><strong>1. RUN:</strong> If there is an escape route, leave immediately. Encourage others but do not wait. Abandon your belongings. Call 999 when safe.</li><li><strong>2. HIDE:</strong> If escape is not possible, find a secure location. Lock or barricade doors. Turn off lights. Silence your phone. Stay away from doors.</li><li><strong>3. FIGHT:</strong> Only as a last resort when your life is in immediate danger. Act with complete commitment — half-measures are ineffective.</li></ul>` },
+          { tag: "Environmental Tools", title: "Using Your Environment for Safety", body: `Before any self-defence technique, leverage your environment:<br><ul><li><strong>Distance:</strong> The most important factor — maintain maximum distance from any threat</li><li><strong>Barriers:</strong> Tables, shelves, doors — anything between you and a threat creates time</li><li><strong>Improvised tools:</strong> Fire extinguisher (confusion + physical barrier), laptop bag (shield), heavy objects</li></ul><div class="key-points"><div class="key-points-title">Key Principle</div>Your goal is not to win a fight — it is to create enough disruption to escape. Act decisively, then run.</div>` },
+          { tag: "After the Incident", title: "What to Do When It's Over", body: `After reaching safety:<br><ul><li><strong>Call 999</strong> — provide your location, number of people with you, and last known location of the assailant</li><li><strong>Follow police instructions</strong> — keep hands visible when officers arrive; do not run toward them unexpectedly</li><li><strong>Do not re-enter</strong> the building until cleared by authorities</li><li><strong>Seek psychological support</strong> — trauma responses often surface 24–72 hours after the event; debriefing is essential</li></ul>` }
+        ],
+        quiz: [
+          { q: "In the Run. Hide. Fight. protocol, what is the correct priority order?", options: ["Fight first to create confusion, then run", "Hide first, then run, then fight", "Run first; hide if not possible; fight only as last resort", "All three are equally effective — choose freely"], answer: 2, explanation: "The correct priority is: Run (escape if possible) → Hide (if escape is not possible, secure a location) → Fight (only as an absolute last resort)." },
+          { q: "After reaching safety following an active assailant incident, what is the first priority?", options: ["Return to collect your belongings", "Call 999 and provide your location and details", "Find your colleagues before calling anyone", "Return to help others inside"], answer: 1, explanation: "Calling 999 immediately with your location, number of people with you, and what you know about the incident helps emergency responders reach the right place." }
+        ]
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const state = {
+  progress: {}, // moduleId -> { completed, score }
+  currentCourse: null,
+  currentModule: null,
+  currentSlide: 0,
+  quizState: { qIndex: 0, answers: [], answered: false, selected: null, done: false }
+};
+
+function getModuleProgress(moduleId) { return state.progress[moduleId] || { completed: false, score: null }; }
+function setModuleComplete(moduleId, score) { state.progress[moduleId] = { completed: true, score }; }
+
+function getCourseProgress(course) {
+  const done = course.modules.filter(m => getModuleProgress(m.id).completed).length;
+  return { done, total: course.modules.length, pct: Math.round((done / course.modules.length) * 100) };
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCREENS
+// ═══════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showCatalog() { renderCatalog(); showScreen('screen-catalog'); }
+
+function showCourse(courseId) {
+  state.currentCourse = COURSES.find(c => c.id === courseId);
+  renderCourse();
+  showScreen('screen-course');
+}
+
+function showModule(courseId, moduleId) {
+  state.currentCourse = COURSES.find(c => c.id === courseId);
+  state.currentModule = state.currentCourse.modules.find(m => m.id === moduleId);
+  state.currentSlide = 0;
+  state.quizState = { qIndex: 0, answers: [], answered: false, selected: null, done: false };
+  renderModule();
+  showScreen('screen-module');
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER CATALOG
+// ═══════════════════════════════════════════════════════
+function renderCatalog() {
+  const grid = document.getElementById('courses-grid');
+  grid.innerHTML = COURSES.map(course => {
+    const prog = getCourseProgress(course);
+    const allDone = prog.done === prog.total;
+    return `
+    <div class="course-card" onclick="showCourse('${course.id}')">
+      <div class="course-card-header">
+        <div class="course-icon" style="background:${course.iconBg}">${course.icon}</div>
+        <div>
+          <div class="course-title">${course.title}</div>
+          <div class="course-meta">${course.modules.length} modules · ${course.duration}</div>
+        </div>
+      </div>
+      <div class="course-desc">${course.description}</div>
+      <div class="course-footer">
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${prog.pct}%"></div></div>
+        <span class="progress-label">${prog.done}/${prog.total}</span>
+        <button class="btn-start ${allDone ? 'completed' : ''}" onclick="event.stopPropagation(); showCourse('${course.id}')">
+          ${allDone ? '✓ Done' : prog.done > 0 ? 'Continue' : 'Start'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER COURSE
+// ═══════════════════════════════════════════════════════
+function renderCourse() {
+  const course = state.currentCourse;
+  const prog = getCourseProgress(course);
+  const el = document.getElementById('course-detail');
+  el.innerHTML = `
+  <div class="course-header-block">
+    <div class="course-header-icon">${course.icon}</div>
+    <div>
+      <div class="course-header-title">${course.title}</div>
+      <div class="course-header-desc">${course.description}</div>
+      <div class="course-header-stats">
+        <div class="chs"><div class="chs-num">${course.modules.length}</div><div class="chs-label">Modules</div></div>
+        <div class="chs"><div class="chs-num">${course.duration}</div><div class="chs-label">Duration</div></div>
+        <div class="chs"><div class="chs-num">${prog.pct}%</div><div class="chs-label">Complete</div></div>
+      </div>
+    </div>
+  </div>
+  ${course.deepCourse ? `
+  <div style="background:#EFF8E4;border:2px solid #6DC12A;border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-weight:700;color:#3A7015;font-size:.95rem">🦅 Deep Dive Course Available</div>
+      <div style="font-size:.82rem;color:#4A5240;margin-top:3px">Go deeper with interactive games, Kim's Game, hazard spotter, HALT check &amp; 15 scenario-based quiz questions.</div>
+    </div>
+    <a href="${course.deepCourse}" target="_blank" style="background:#6DC12A;color:#fff;padding:10px 20px;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none;white-space:nowrap">Launch Deep Course →</a>
+  </div>` : ''}
+  <div class="section-header" style="margin-bottom:16px">Modules</div>
+  <div class="modules-list">
+    ${course.modules.map((mod, i) => {
+      const mp = getModuleProgress(mod.id);
+      const locked = i > 0 && !getModuleProgress(course.modules[i-1].id).completed;
+      return `
+      <div class="module-row ${mp.completed ? 'completed' : ''} ${locked ? 'locked' : ''}"
+           onclick="${locked ? '' : `showModule('${course.id}','${mod.id}')`}">
+        <div class="module-num ${mp.completed ? 'done' : ''}">${mp.completed ? '✓' : i+1}</div>
+        <div class="module-info">
+          <div class="module-name">${mod.title}</div>
+          <div class="module-sub">${mod.sub}</div>
+        </div>
+        <span class="module-badge ${mp.completed ? 'badge-done' : locked ? 'badge-locked' : 'badge-todo'}">
+          ${mp.completed ? `✓ Score: ${mp.score}%` : locked ? '🔒 Locked' : 'Start'}
+        </span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER MODULE
+// ═══════════════════════════════════════════════════════
+function renderModule() {
+  const mod = state.currentModule;
+  const course = state.currentCourse;
+  const totalSteps = mod.slides.length + 1; // slides + quiz
+  const currentStep = state.currentSlide;
+  const pct = Math.round((currentStep / totalSteps) * 100);
+
+  const el = document.getElementById('module-content');
+  let html = `
+  <button class="back-btn" onclick="showCourse('${course.id}'); renderCourse();">← Back to ${course.title}</button>
+  <div class="module-progress-bar"><div class="module-progress-fill" style="width:${pct}%"></div></div>`;
+
+  if (currentStep < mod.slides.length) {
+    const slide = mod.slides[currentStep];
+    html += `
+    <div class="slide-card">
+      <div class="slide-tag">${slide.tag || ''}</div>
+      <div class="slide-title">${slide.title}</div>
+      <div class="slide-body">${slide.body}</div>
+    </div>
+    <div class="slide-nav">
+      <button class="nav-btn secondary" onclick="goSlide(${currentStep - 1})" ${currentStep === 0 ? 'disabled' : ''}>← Previous</button>
+      <span class="slide-counter">${currentStep + 1} of ${totalSteps}</span>
+      <button class="nav-btn" onclick="goSlide(${currentStep + 1})">
+        ${currentStep === mod.slides.length - 1 ? 'Take Quiz →' : 'Next →'}
+      </button>
+    </div>`;
+  } else {
+    html += renderQuiz(mod);
+  }
+
+  el.innerHTML = html;
+}
+
+function goSlide(index) {
+  state.currentSlide = index;
+  renderModule();
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER QUIZ
+// ═══════════════════════════════════════════════════════
+function renderQuiz(mod) {
+  const qs = state.quizState;
+
+  if (qs.done) {
+    const score = Math.round((qs.answers.filter((a,i) => a === mod.quiz[i].answer).length / mod.quiz.length) * 100);
+    const passed = score >= 70;
+    setModuleComplete(mod.id, score);
+    return `
+    <div class="quiz-card">
+      <div class="quiz-results">
+        <div style="font-size:3rem;margin-bottom:12px">${passed ? '🎉' : '📖'}</div>
+        <div class="quiz-score">${score}%</div>
+        <div class="quiz-score-label">${passed ? 'Module Complete!' : 'Keep Practising'}</div>
+        ${passed ? `<div class="badge-earned">🏅 ${state.currentCourse.badge} Badge Earned</div>` : ''}
+        <p style="color:var(--grey-text);font-size:0.9rem;margin:16px 0">
+          ${passed ? 'You answered ' + qs.answers.filter((a,i) => a === mod.quiz[i].answer).length + ' of ' + mod.quiz.length + ' questions correctly.' : 'You need 70% to pass. Review the module and try again.'}
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="nav-btn secondary" onclick="goSlide(0)">Review Module</button>
+          <button class="nav-btn" onclick="showCourse('${state.currentCourse.id}'); renderCourse();">
+            ${passed ? '→ Next Module' : '→ Back to Course'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const q = mod.quiz[qs.qIndex];
+  const totalSteps = mod.slides.length + 1;
+
+  return `
+  <div class="quiz-card">
+    <div class="quiz-header">
+      <h3>Module Quiz: ${mod.title}</h3>
+      <p>Question ${qs.qIndex + 1} of ${mod.quiz.length}</p>
+    </div>
+    <div class="quiz-q-num">Question ${qs.qIndex + 1}</div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options">
+      ${q.options.map((opt, i) => {
+        let cls = 'quiz-option';
+        if (qs.answered) {
+          if (i === q.answer) cls += ' correct';
+          else if (i === qs.selected) cls += ' wrong';
+          cls += '" disabled';
+        } else {
+          cls += qs.selected === i ? ' selected' : '';
+        }
+        return `<button class="${cls}" onclick="selectAnswer(${i})">${opt}</button>`;
+      }).join('')}
+    </div>
+    ${qs.answered ? `
+      <div class="quiz-feedback ${qs.selected === q.answer ? 'correct' : 'wrong'}">
+        ${qs.selected === q.answer ? '✓ Correct! ' : '✗ Not quite. '} ${q.explanation}
+      </div>
+      <div class="slide-nav">
+        <span></span>
+        <span class="slide-counter">${mod.slides.length + 1} of ${totalSteps}</span>
+        <button class="nav-btn" onclick="nextQuestion()">
+          ${qs.qIndex < mod.quiz.length - 1 ? 'Next Question →' : 'See Results →'}
+        </button>
+      </div>` : `
+      <div class="slide-nav">
+        <button class="nav-btn secondary" onclick="goSlide(${mod.slides.length - 1})">← Review</button>
+        <span class="slide-counter">${mod.slides.length + 1} of ${totalSteps}</span>
+        <button class="nav-btn" onclick="submitAnswer()" ${qs.selected === null ? 'disabled' : ''}>Submit Answer</button>
+      </div>`}
+  </div>`;
+}
+
+function selectAnswer(i) {
+  if (state.quizState.answered) return;
+  state.quizState.selected = i;
+  renderModule();
+}
+
+function submitAnswer() {
+  const qs = state.quizState;
+  if (qs.selected === null) return;
+  qs.answered = true;
+  qs.answers.push(qs.selected);
+  renderModule();
+}
+
+function nextQuestion() {
+  const qs = state.quizState;
+  if (qs.qIndex < state.currentModule.quiz.length - 1) {
+    qs.qIndex++;
+    qs.answered = false;
+    qs.selected = null;
+  } else {
+    qs.done = true;
+  }
+  renderModule();
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+renderCatalog();
+</script>
+</body>
+</html>

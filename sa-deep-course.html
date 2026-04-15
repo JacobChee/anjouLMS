@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Situational Awareness — AnjouHealth Deep Course</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#6DC12A;--gd:#3A7015;--r:#E03C31;
+  --dk:#1A1A1A;--wh:#fff;--lg:#EFF8E4;--gr:#4A5240;
+  --shadow:0 4px 24px rgba(109,193,42,.15);
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f7f0;color:var(--dk);min-height:100vh}
+
+/* ── top bar ── */
+#topbar{background:var(--dk);color:#fff;display:flex;align-items:center;gap:12px;padding:12px 24px;position:sticky;top:0;z-index:100}
+#topbar .logo{font-weight:800;font-size:1.05rem;letter-spacing:.08em;color:var(--g)}
+#topbar .course-title{font-size:.85rem;color:#bbb;flex:1}
+#prog-wrap{width:160px;height:6px;background:#333;border-radius:4px}
+#prog-bar{height:6px;background:var(--g);border-radius:4px;transition:width .4s}
+#prog-label{font-size:.75rem;color:#aaa;white-space:nowrap}
+
+/* ── layout ── */
+#app{max-width:900px;margin:0 auto;padding:24px 16px}
+.screen{display:none}.screen.active{display:block}
+
+/* ── hero / landing ── */
+.hero{background:var(--dk);border-radius:16px;padding:48px 40px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:rgba(109,193,42,.12)}
+.hero .badge-chip{display:inline-block;background:var(--r);color:#fff;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:.06em;margin-bottom:16px}
+.hero h1{font-size:2.2rem;font-weight:800;line-height:1.15;margin-bottom:10px}
+.hero h1 span{color:var(--g)}
+.hero p{color:#bbb;font-size:.95rem;max-width:500px;margin-bottom:28px}
+.hero-meta{display:flex;gap:24px;flex-wrap:wrap}
+.hero-meta .stat{text-align:center}
+.hero-meta .stat .n{font-size:1.5rem;font-weight:800;color:var(--g)}
+.hero-meta .stat .l{font-size:.72rem;color:#888;margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;border:none;transition:.2s}
+.btn-primary{background:var(--g);color:#fff}.btn-primary:hover{background:var(--gd)}
+.btn-red{background:var(--r);color:#fff}
+.btn-outline{background:transparent;border:2px solid var(--g);color:var(--g)}.btn-outline:hover{background:var(--lg)}
+.btn-sm{padding:8px 16px;font-size:.82rem}
+
+/* ── module nav ── */
+.mod-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.mod-tab{padding:8px 18px;border-radius:8px;border:2px solid #ddd;background:#fff;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--gr);transition:.2s}
+.mod-tab.active{border-color:var(--g);background:var(--lg);color:var(--gd)}
+.mod-tab.done{border-color:var(--g);background:var(--g);color:#fff}
+
+/* ── slide card ── */
+.slide-card{background:#fff;border-radius:16px;padding:32px;box-shadow:var(--shadow);margin-bottom:20px}
+.slide-card h2{font-size:1.4rem;color:var(--dk);margin-bottom:6px}
+.slide-card .subtitle{color:var(--gr);font-size:.88rem;margin-bottom:20px;border-left:3px solid var(--g);padding-left:10px}
+
+/* ── slide nav ── */
+.slide-nav{display:flex;align-items:center;justify-content:space-between;margin-top:20px}
+.slide-counter{font-size:.82rem;color:#888}
+.slide-dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#ddd}
+.dot.active{background:var(--g);width:22px;border-radius:4px}
+.dot.done{background:var(--gd)}
+
+/* ── content blocks ── */
+.info-box{background:var(--lg);border-radius:12px;padding:18px 20px;margin:16px 0;border-left:4px solid var(--g)}
+.info-box.red{background:#fdf0ef;border-left-color:var(--r)}
+.info-box.warning{background:#fff8e1;border-left-color:#E8A020}
+.info-box h4{font-size:.9rem;font-weight:700;margin-bottom:6px;color:var(--gd)}
+.info-box.red h4{color:var(--r)}
+.fact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0}
+.fact-card{background:var(--lg);border-radius:12px;padding:16px;text-align:center}
+.fact-card .num{font-size:2rem;font-weight:800;color:var(--g)}
+.fact-card .lbl{font-size:.78rem;color:var(--gr);margin-top:4px}
+.step-list{list-style:none;margin:12px 0}
+.step-list li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.step-list li:last-child{border-bottom:none}
+.step-num{min-width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;margin-top:1px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+/* ── SVG diagrams ── */
+.svg-wrap{display:flex;justify-content:center;margin:20px 0}
+svg text{font-family:'Segoe UI',Arial,sans-serif}
+
+/* ── DOMINO GAME ── */
+.domino-wrap{background:#1a1a1a;border-radius:14px;padding:24px 16px 32px;margin:16px 0;position:relative}
+.domino-stage{display:flex;align-items:flex-end;gap:10px;justify-content:center;height:140px;padding:10px 0 20px;position:relative}
+.domino-ground{position:absolute;bottom:20px;left:10%;right:10%;height:3px;background:#333;border-radius:2px}
+.domino{width:44px;height:90px;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:#fff;text-align:center;line-height:1.3;transform-origin:bottom center;transition:transform .5s cubic-bezier(.55,.05,.68,1.3);cursor:pointer;position:relative;user-select:none;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.domino:hover{filter:brightness(1.2)}
+.domino.fallen{transform:rotate(88deg) translateX(24px)}
+.domino.caught{outline:3px solid #6DC12A;outline-offset:2px;animation:pulse-green .4s ease}
+@keyframes pulse-green{0%{box-shadow:0 0 0 0 rgba(109,193,42,.7)}100%{box-shadow:0 0 0 12px rgba(109,193,42,0)}}
+.domino-icon{font-size:1.2rem;margin-bottom:4px}
+.domino-label{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);font-size:.58rem;color:#aaa;white-space:nowrap;width:80px;text-align:center}
+.domino-controls{display:flex;gap:10px;justify-content:center;margin:12px 0 8px;flex-wrap:wrap}
+.domino-tip{text-align:center;font-size:.75rem;color:#888;margin-top:4px}
+
+/* ── HAZARD SPOTTER ── */
+.hazard-scene{display:block;border-radius:12px;overflow:hidden;margin:16px 0;cursor:crosshair;width:100%}
+.hz-hotspot{cursor:pointer}
+.hz-hotspot circle.ring{fill:none;stroke:#FFD700;stroke-width:2.5;opacity:.85;animation:hz-pulse 1.4s ease-in-out infinite}
+.hz-hotspot.found circle.ring{stroke:#6DC12A;animation:none;opacity:1}
+.hz-hotspot.found circle.fill{fill:rgba(109,193,42,.35)}
+.hz-hotspot.missed circle.ring{stroke:#E03C31;animation:none;opacity:1}
+.hz-hotspot.missed circle.fill{fill:rgba(224,60,49,.25)}
+@keyframes hz-pulse{0%,100%{r:14;opacity:.7}50%{r:18;opacity:1}}
+.hz-hotspot text{font-size:16px;pointer-events:none;user-select:none}
+.hazard-score{text-align:center;font-weight:700;font-size:1.1rem;color:var(--gd);margin:8px 0}
+
+/* ── KIM'S GAME ── */
+.kims-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.kims-item{background:var(--lg);border-radius:10px;padding:16px 8px;text-align:center;font-size:2rem;position:relative}
+.kims-item .name{font-size:.7rem;color:var(--gr);margin-top:4px;font-weight:600}
+.kims-item.hidden{background:#f0f0f0;color:transparent}
+.kims-item.hidden .name{color:transparent}
+.kims-timer{font-size:1.8rem;font-weight:800;color:var(--g);text-align:center;margin:8px 0}
+.recall-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.recall-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:2px solid #eee;border-radius:8px;cursor:pointer;font-size:.82rem;transition:.2s}
+.recall-item.checked{border-color:var(--g);background:var(--lg)}
+.recall-item.correct{border-color:var(--g);background:var(--lg)}
+.recall-item.wrong{border-color:var(--r);background:#fdf0ef}
+.kims-result{text-align:center;padding:16px;background:var(--lg);border-radius:10px;margin-top:12px}
+
+/* ── HALT CHECK ── */
+.halt-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.halt-card{background:var(--lg);border-radius:12px;padding:18px}
+.halt-card h4{font-size:.9rem;font-weight:700;color:var(--gd);margin-bottom:4px}
+.halt-card p{font-size:.78rem;color:var(--gr);margin-bottom:12px}
+.halt-slider{width:100%;appearance:none;height:6px;border-radius:4px;background:#ccc;outline:none}
+.halt-slider::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--g);cursor:pointer}
+.halt-level{font-size:.75rem;font-weight:700;margin-top:6px}
+.halt-status{margin-top:20px;padding:16px;border-radius:12px;text-align:center;font-weight:700}
+.halt-status.safe{background:#d4edda;color:#155724}
+.halt-status.caution{background:#fff3cd;color:#856404}
+.halt-status.danger{background:#f8d7da;color:#721c24}
+
+/* ── SCAN GAME ── */
+.scan-stage{position:relative;background:#2a2a2a;border-radius:12px;overflow:hidden;height:180px;display:flex;align-items:center;justify-content:center;margin:16px 0}
+.scan-countdown{font-size:3rem;font-weight:800;color:var(--g);position:absolute}
+.scan-item{position:absolute;font-size:1.5rem;transition:.3s}
+.scan-overlay{position:absolute;inset:0;background:#2a2a2a;opacity:0;transition:opacity .5s;pointer-events:none}
+.scan-overlay.covered{opacity:1}
+.scan-q{margin:10px 0}
+.scan-q label{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:2px solid #eee;cursor:pointer;font-size:.85rem;margin-bottom:6px;transition:.2s}
+.scan-q label:hover{border-color:var(--g)}
+.scan-q label.correct-ans{border-color:var(--g);background:var(--lg)}
+.scan-q label.wrong-ans{border-color:var(--r);background:#fdf0ef}
+
+/* ── BREATHING ── */
+.breath-circle{width:140px;height:140px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;margin:20px auto;color:#fff;font-weight:700;font-size:1rem;transition:transform 4s ease-in-out,background 4s ease;box-shadow:0 0 0 0 rgba(109,193,42,.4)}
+.breath-circle.expand{transform:scale(1.5);box-shadow:0 0 0 30px rgba(109,193,42,.1)}
+.breath-circle.hold{background:var(--gd)}
+.breath-circle.contract{transform:scale(1);box-shadow:0 0 0 0 rgba(109,193,42,0)}
+.breath-label{text-align:center;color:var(--gr);font-size:.9rem;margin-top:8px}
+
+/* ── QUIZ ── */
+.quiz-wrap{background:#fff;border-radius:16px;padding:28px;box-shadow:var(--shadow)}
+.quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.q-num{font-size:.8rem;color:#888;font-weight:600}
+.q-score-bar{height:4px;background:#f0f0f0;border-radius:4px;margin-bottom:20px;overflow:hidden}
+.q-score-fill{height:100%;background:var(--g);border-radius:4px;transition:width .4s}
+.quiz-scenario{background:#f8f9fa;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:.88rem;color:var(--gr);border-left:3px solid #ccc;font-style:italic}
+.quiz-scenario strong{color:var(--dk);font-style:normal}
+.quiz-q{font-size:1.05rem;font-weight:700;color:var(--dk);margin-bottom:16px;line-height:1.45}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{padding:12px 16px;border-radius:10px;border:2px solid #e8e8e8;cursor:pointer;font-size:.88rem;transition:.2s;text-align:left}
+.q-opt:hover:not(.disabled){border-color:var(--g);background:var(--lg)}
+.q-opt.selected{border-color:var(--g);background:var(--lg)}
+.q-opt.correct{border-color:var(--g);background:var(--lg);font-weight:600}
+.q-opt.wrong{border-color:var(--r);background:#fdf0ef}
+.q-opt.disabled{cursor:default;opacity:.7}
+.quiz-explain{margin-top:16px;padding:14px;background:var(--lg);border-radius:10px;font-size:.85rem;border-left:3px solid var(--g);display:none}
+.quiz-explain.show{display:block}
+.quiz-explain strong{color:var(--gd)}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+
+/* ── CERTIFICATE ── */
+.cert{background:var(--dk);border-radius:20px;padding:48px 40px;text-align:center;color:#fff}
+.cert .trophy{font-size:4rem;margin-bottom:16px}
+.cert h2{font-size:1.8rem;font-weight:800;color:var(--g);margin-bottom:8px}
+.cert p{color:#bbb;margin-bottom:24px}
+.cert-badge{display:inline-block;padding:16px 32px;border-radius:12px;background:rgba(109,193,42,.15);border:2px solid var(--g);color:var(--g);font-size:1.1rem;font-weight:800;letter-spacing:.05em;margin-bottom:24px}
+.score-summary{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin:24px 0}
+.score-summary .s{text-align:center}
+.score-summary .s .n{font-size:2rem;font-weight:800;color:var(--g)}
+.score-summary .s .l{font-size:.75rem;color:#888}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">ANJOUHEALTH</div>
+  <div class="course-title">Situational Awareness — Deep Course</div>
+  <div id="prog-wrap"><div id="prog-bar" style="width:0%"></div></div>
+  <div id="prog-label">0%</div>
+</div>
+
+<div id="app">
+
+<!-- ════════════════ LANDING ════════════════ -->
+<div class="screen active" id="screen-landing">
+  <div class="hero">
+    <div class="badge-chip">DEEP COURSE · 3 MODULES</div>
+    <h1>Situational<br><span>Awareness</span></h1>
+    <p>See it. Sense it. Stop it. A hands-on, evidence-based course built from AnjouHealth's Q3 2025 APAC EHS campaign at Google Data Centres.</p>
+    <div class="hero-meta">
+      <div class="stat"><div class="n">3</div><div class="l">Modules</div></div>
+      <div class="stat"><div class="n">18</div><div class="l">Slides</div></div>
+      <div class="stat"><div class="n">15</div><div class="l">Quiz Questions</div></div>
+      <div class="stat"><div class="n">5</div><div class="l">Interactive Games</div></div>
+      <div class="stat"><div class="n">~45 min</div><div class="l">Total Time</div></div>
+    </div>
+    <br>
+    <button class="btn btn-red" onclick="startCourse()">Start Course ›</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:8px">
+    <div class="slide-card" style="border-top:4px solid var(--g)">
+      <div style="font-size:1.5rem;margin-bottom:8px">💥</div>
+      <strong>Module 1</strong><br>
+      <span style="font-size:.82rem;color:var(--gr)">The Domino Effect — understanding how hazards cascade and why SA breaks down</span>
+    </div>
+    <div class="slide-card" style="border-top:4px solid var(--g)">
+      <div style="font-size:1.5rem;margin-bottom:8px">👁️</div>
+      <strong>Module 2</strong><br>
+      <span style="font-size:.82rem;color:var(--gr)">Peripheral Vision &amp; Observation — train your built-in safety radar</span>
+    </div>
+    <div class="slide-card" style="border-top:4px solid var(--g)">
+      <div style="font-size:1.5rem;margin-bottom:8px">🧠</div>
+      <strong>Module 3</strong><br>
+      <span style="font-size:.82rem;color:var(--gr)">Mental Wellbeing &amp; Focus — how your mental state affects what you notice</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ COURSE ════════════════ -->
+<div class="screen" id="screen-course">
+  <div class="mod-nav">
+    <button class="mod-tab active" id="tab-1" onclick="goMod(1)">💥 Module 1: The Domino Effect</button>
+    <button class="mod-tab" id="tab-2" onclick="goMod(2)">👁️ Module 2: Observation</button>
+    <button class="mod-tab" id="tab-3" onclick="goMod(3)">🧠 Module 3: Mental Focus</button>
+  </div>
+
+  <div id="slide-area"></div>
+
+  <div class="slide-nav">
+    <button class="btn btn-outline btn-sm" id="btn-prev" onclick="prevSlide()">← Back</button>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div class="slide-dots" id="slide-dots"></div>
+      <div class="slide-counter" id="slide-counter"></div>
+    </div>
+    <button class="btn btn-primary btn-sm" id="btn-next" onclick="nextSlide()">Next →</button>
+  </div>
+</div>
+
+<!-- ════════════════ CERTIFICATE ════════════════ -->
+<div class="screen" id="screen-cert">
+  <div class="cert">
+    <div class="trophy">🏆</div>
+    <h2>Eagle Eye Certified</h2>
+    <p>You've completed the AnjouHealth Situational Awareness Deep Course</p>
+    <div class="cert-badge">🦅 EAGLE EYE</div>
+    <div class="score-summary">
+      <div class="s"><div class="n" id="cert-score">-</div><div class="l">Quiz Score</div></div>
+      <div class="s"><div class="n">3/3</div><div class="l">Modules</div></div>
+      <div class="s"><div class="n">100%</div><div class="l">Completion</div></div>
+    </div>
+    <button class="btn btn-primary" onclick="restart()">Restart Course</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const MODULES = [
+
+// ══ MODULE 1 ══════════════════════════════════════════════════════════════════
+{ id:1, title:'The Domino Effect', slides:[
+
+{type:'content', title:'What is Situational Awareness?', subtitle:"Mica Endsley's 3-Level SA Model — the science behind noticing what matters",
+html:`
+<div class="svg-wrap">
+<svg width="480" height="220" viewBox="0 0 480 220">
+  <!-- Level 3 outer -->
+  <ellipse cx="240" cy="110" rx="230" ry="105" fill="#EFF8E4" stroke="#6DC12A" stroke-width="2"/>
+  <!-- Level 2 -->
+  <ellipse cx="240" cy="110" rx="165" ry="75" fill="#d4edba" stroke="#4A9E1E" stroke-width="2"/>
+  <!-- Level 1 core -->
+  <ellipse cx="240" cy="110" rx="95" ry="45" fill="#6DC12A" stroke="#3A7015" stroke-width="2"/>
+  <!-- Labels -->
+  <text x="240" y="104" text-anchor="middle" fill="white" font-weight="800" font-size="13">LEVEL 1</text>
+  <text x="240" y="120" text-anchor="middle" fill="white" font-size="11">PERCEIVE</text>
+  <text x="240" y="55" text-anchor="middle" fill="#3A7015" font-weight="700" font-size="12">LEVEL 2: COMPREHEND</text>
+  <text x="240" y="175" text-anchor="middle" fill="#3A7015" font-size="10">What does it mean?</text>
+  <text x="240" y="22" text-anchor="middle" fill="#1A1A1A" font-weight="700" font-size="12">LEVEL 3: PROJECT</text>
+  <text x="240" y="200" text-anchor="middle" fill="#1A1A1A" font-size="10">What will happen next?</text>
+</svg>
+</div>
+<div class="two-col">
+  <div class="info-box"><h4>Level 1 — Perceive</h4>Detecting elements in your environment: sounds, movement, objects, people. Your eyes and ears feeding raw data.</div>
+  <div class="info-box"><h4>Level 2 — Comprehend</h4>Understanding what that data <em>means</em> in context. Is the wet floor a cleaning residue or a leak?</div>
+</div>
+<div class="info-box" style="background:#fdf0ef;border-left-color:#E03C31"><h4 style="color:#E03C31">Level 3 — Project</h4>Predicting what will happen <em>next</em>: "That cable across the aisle will cause someone to trip if I don't act now." Most workplace injuries happen when workers never reach Level 3.</div>
+`},
+
+{type:'content', title:'Why SA Fails: The Numbers', subtitle:'88% of workplace incidents involve some form of situational awareness failure',
+html:`
+<div class="fact-grid">
+  <div class="fact-card"><div class="num">88%</div><div class="lbl">of incidents involve human factors / SA failure<br><small>(HSE, 2023)</small></div></div>
+  <div class="fact-card"><div class="num">70%</div><div class="lbl">of workers admit to ignoring a hazard they noticed, at least once</div></div>
+  <div class="fact-card"><div class="num">4×</div><div class="lbl">more likely to miss a hazard when cognitively overloaded</div></div>
+  <div class="fact-card"><div class="num">6 sec</div><div class="lbl">average time between spotting a hazard and making an intervention decision</div></div>
+</div>
+<div class="info-box warning"><h4>The Normalisation of Deviance</h4>When workers see minor hazards repeatedly without incident, the brain classifies them as "safe." This cognitive shortcut — normalisation of deviance — is one of the most dangerous SA failures in any workplace.</div>
+<div class="info-box"><h4>SA vs. Attention</h4>SA is not simply "paying attention." Attention is a limited resource. SA is a <strong>skill</strong> you can practise — building habits that notice more with less mental effort.</div>
+`},
+
+{type:'game-domino', title:'The Domino Effect — Interactive', subtitle:'Click START to watch how one unreported hazard cascades into a major incident. Click STOP THE CHAIN at any point.'},
+
+{type:'content', title:"Heinrich's Triangle", subtitle:'For every major injury, the data shows hundreds of near-misses were ignored',
+html:`
+<div class="svg-wrap">
+<svg width="420" height="260" viewBox="0 0 420 260">
+  <!-- Triangle -->
+  <polygon points="210,10 20,250 400,250" fill="#EFF8E4" stroke="#6DC12A" stroke-width="2"/>
+  <!-- Sections -->
+  <line x1="127" y1="170" x2="293" y2="170" stroke="#6DC12A" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="73" y1="210" x2="347" y2="210" stroke="#4A9E1E" stroke-width="1.5" stroke-dasharray="4"/>
+  <!-- Labels -->
+  <text x="210" y="80" text-anchor="middle" fill="#E03C31" font-weight="800" font-size="14">1</text>
+  <text x="210" y="96" text-anchor="middle" fill="#E03C31" font-size="10">MAJOR INJURY</text>
+  <text x="210" y="135" text-anchor="middle" fill="#3A7015" font-weight="800" font-size="14">29</text>
+  <text x="210" y="150" text-anchor="middle" fill="#3A7015" font-size="10">MINOR INJURIES</text>
+  <text x="210" y="190" text-anchor="middle" fill="#1A1A1A" font-weight="800" font-size="14">300</text>
+  <text x="210" y="205" text-anchor="middle" fill="#1A1A1A" font-size="10">NEAR-MISSES (unreported)</text>
+  <text x="210" y="248" text-anchor="middle" fill="#4A5240" font-size="9">Herbert Heinrich, 1931 — Industrial Accident Prevention</text>
+</svg>
+</div>
+<div class="info-box"><h4>Near-Misses Are Your Data</h4>Every near-miss is a warning the system is trying to send you. Organisations that treat near-miss reports seriously — not punitively — consistently see 40–60% reductions in major incidents within 2 years.</div>
+<div class="info-box red"><h4 style="color:#E03C31">At Your Site</h4>If your team has had <strong>1 minor incident</strong> in the past year, statistically there were <strong>300 near-misses</strong> that no one reported. SA training is about catching those 300.</div>
+`},
+
+{type:'game-hazard', title:'Spot the Hazards — Data Centre Floor', subtitle:'Click every hazard you can find in this scene. You have 60 seconds.'},
+
+{type:'content', title:'The 3-Level SA Response Protocol', subtitle:'A practical framework for applying SA on the job, every shift',
+html:`
+<ul class="step-list">
+  <li><div class="step-num">1</div><div><strong>STOP (2 breaths)</strong><br><span style="font-size:.85rem;color:var(--gr)">Before starting any task, pause for 2 intentional breaths. This brief pause activates the prefrontal cortex — the part of the brain responsible for hazard recognition. Rushing is the #1 SA killer.</span></div></li>
+  <li><div class="step-num">2</div><div><strong>LOOK (5-second scan)</strong><br><span style="font-size:.85rem;color:var(--gr)">Sweep left → centre → right → above → below. Name what you see. Don't rely on memory of "how it usually looks" — actively look at what is <em>actually</em> there right now.</span></div></li>
+  <li><div class="step-num">3</div><div><strong>THINK (Level 2 + 3)</strong><br><span style="font-size:.85rem;color:var(--gr)">Ask: "What could change? What could go wrong? Who else could be affected?" This moves you from Level 1 (perceive) to Level 3 (project).</span></div></li>
+  <li><div class="step-num">4</div><div><strong>ACT (report or fix)</strong><br><span style="font-size:.85rem;color:var(--gr)">If safe to fix — fix it. If not — isolate, report, and follow up. Never assume someone else will report it. Bystander effect is a real and documented SA failure mode.</span></div></li>
+</ul>
+<div class="info-box"><h4>Why Naming Hazards Works</h4>Saying "cable across aisle — trip hazard" out loud activates dual-encoding: your brain processes the hazard both visually and verbally, making it 40% more likely to trigger action compared to silent observation alone (Paivio, 1971).</div>
+`},
+
+{type:'content', title:'Case Study: The Silent Hazard', subtitle:'A real-pattern scenario based on data centre incident reports',
+html:`
+<div class="info-box warning"><h4>Scenario Background</h4>It is 07:30. Jayden, a data centre technician, arrives for the early shift. He is running 8 minutes late after a difficult commute. He notices a small puddle of coolant near Cabinet Row C — the same spot that was wet last Tuesday. He thinks: <em>"The cleaning crew will get it. I need to get to the morning briefing."</em></div>
+<div class="two-col">
+  <div>
+    <strong style="color:#E03C31">What went wrong:</strong>
+    <ul style="margin:10px 0 0 16px;font-size:.85rem;line-height:1.8">
+      <li>SA Level 1 ✓ — Jayden <em>perceived</em> the hazard</li>
+      <li>SA Level 2 ✗ — He did <em>not comprehend</em> it fully (recurring coolant = possible pipe issue)</li>
+      <li>SA Level 3 ✗ — He did <em>not project</em> who would walk past before the cleaner arrived</li>
+      <li>Bystander effect — assumed someone else would act</li>
+      <li>Time pressure — rushing degraded cognitive bandwidth</li>
+    </ul>
+  </div>
+  <div>
+    <strong style="color:#6DC12A">What he should have done:</strong>
+    <ul style="margin:10px 0 0 16px;font-size:.85rem;line-height:1.8">
+      <li>Placed a wet floor cone immediately (30 seconds)</li>
+      <li>Photographed and reported via the safety app</li>
+      <li>Flagged to supervisor at morning briefing as a <em>recurring</em> issue</li>
+      <li>Recognised the pattern: same spot = potential infrastructure fault</li>
+    </ul>
+  </div>
+</div>
+<div class="info-box"><h4>The Outcome (3 hours later)</h4>A vendor technician slipped on the coolant puddle, fracturing their wrist. The incident report cited "known hazard, unreported." The organisation faced a MOM investigation and $40,000 in remediation costs.</div>
+`}
+
+], quiz:[
+  {scenario:"You're walking to a server rack when you notice a cable tie has come loose and the cable is hanging lower than usual across the aisle. You're carrying equipment and your hands are full.",
+   q:"According to the 3-level SA model, what is the MOST important immediate action?",
+   opts:["Continue to your destination and report it after you've dropped the equipment","Mentally note it and tell your supervisor at the end of shift","Stop, set the equipment down safely, secure or isolate the cable, then report immediately","Ask a passing colleague to deal with it"],
+   ans:2,
+   explain:"<strong>Level 3 SA requires projection:</strong> someone will walk through that aisle before end-of-shift. The 'carry on' options all assume the hazard will wait — it won't. Stopping takes 90 seconds and prevents a potential MSK or head injury. Under WSH Act, there is a duty to act on known hazards immediately."},
+  {scenario:"Your team has had zero recordable incidents this year. At the safety meeting, someone suggests skipping the near-miss reporting process to save time — 'nothing serious has happened anyway.'",
+   q:"What does Heinrich's Triangle tell us about this reasoning?",
+   opts:["It's reasonable — zero incidents means the workplace is genuinely safe","Zero incidents likely means near-misses aren't being reported, not that they aren't happening","Near-miss reporting is only necessary in high-risk industries","The Triangle is outdated and doesn't apply to modern data centres"],
+   ans:1,
+   explain:"<strong>Heinrich's Triangle:</strong> for every 1 recordable incident there are ~300 near-misses. A 'zero incidents' record with no near-miss reports is a <strong>red flag</strong>, not a green one — it usually signals a reporting culture problem. Organisations that actively log near-misses consistently outperform those that don't, on long-term safety metrics."},
+  {scenario:"Aisha has worked the same corridor for 3 years. She walks it without looking down because 'I know every inch of this place.' Last week, a cable management project left temporary cable runs at floor level.",
+   q:"Which cognitive failure does Aisha's behaviour illustrate?",
+   opts:["Change blindness — failing to notice environmental changes","Confirmation bias — only seeing what confirms past experience","Normalisation of deviance — treating familiar routes as automatically safe","Both A and C — both are occurring simultaneously"],
+   ans:3,
+   explain:"<strong>Both are occurring:</strong> Aisha has normalised this route as safe (normalisation of deviance) AND her brain is filtering out information that doesn't match her memory (change blindness). This dual failure is extremely common in experienced workers — familiarity breeds complacency. The 5-second Entry Scan habit directly counters this."},
+  {scenario:"Your site has 150 staff. In the past year, there was 1 minor injury (sprained ankle from a trip). Based on Heinrich's Triangle, how many near-misses would statistically have occurred?",
+   q:"Select the closest estimate.",
+   opts:["About 10 near-misses","About 30 near-misses","About 300 near-misses — most unreported","About 1,500 near-misses"],
+   ans:2,
+   explain:"<strong>300 near-misses per 1 minor injury</strong> is Heinrich's ratio. On a 150-person site, this suggests significant unreported hazard activity. The near-miss data is where prevention happens — if those 300 signals were captured and acted on, the minor injury (and its potential to escalate) could have been prevented entirely."},
+  {scenario:"During your pre-task STOP-LOOK-THINK-ACT scan, you notice the overhead lighting in one section is flickering. You're not an electrical technician.",
+   q:"What should you do? Select the BEST answer.",
+   opts:["Ignore it — you're not qualified to deal with electrical issues","Complete your task quickly before the light fails completely","Isolate the area with temporary barriers, report to facilities/EHS immediately, and do not work under the flickering light","Note it in your mental checklist and report at end of shift"],
+   ans:2,
+   explain:"<strong>Flickering lighting in a DC environment</strong> can indicate electrical faults, loose connections, or circuit overload — all potential arc flash precursors. You don't need to be an electrician to act: isolate, report, don't ignore. Waiting until end of shift introduces hours of unnecessary risk to anyone working in that zone. This is a Level 3 SA action — projecting what could happen next."}
+]},
+
+// ══ MODULE 2 ══════════════════════════════════════════════════════════════════
+{ id:2, title:'Peripheral Vision & Observation', slides:[
+
+{type:'content', title:'Your Built-In Safety Radar', subtitle:'Understanding the visual system — and why your peripheral vision matters more than you think',
+html:`
+<div class="svg-wrap">
+<svg width="420" height="200" viewBox="0 0 420 200">
+  <!-- Eye shape -->
+  <ellipse cx="210" cy="100" rx="180" ry="80" fill="#EFF8E4" stroke="#6DC12A" stroke-width="2"/>
+  <!-- Peripheral zone -->
+  <ellipse cx="210" cy="100" rx="180" ry="80" fill="rgba(109,193,42,.15)"/>
+  <!-- Central zone -->
+  <ellipse cx="210" cy="100" rx="50" ry="25" fill="rgba(109,193,42,.5)" stroke="#3A7015" stroke-width="1.5"/>
+  <!-- Fovea -->
+  <circle cx="210" cy="100" r="10" fill="#6DC12A"/>
+  <text x="210" y="103" text-anchor="middle" fill="white" font-size="8" font-weight="800">FOVEA</text>
+  <!-- Labels -->
+  <text x="210" y="88" text-anchor="middle" fill="#3A7015" font-size="9">Central: 5° — sharp detail</text>
+  <text x="370" y="75" text-anchor="middle" fill="#4A5240" font-size="9">Peripheral: 180°</text>
+  <text x="370" y="87" text-anchor="middle" fill="#4A5240" font-size="9">motion-sensitive</text>
+  <text x="50" y="75" text-anchor="middle" fill="#4A5240" font-size="9">Peripheral: 180°</text>
+  <text x="50" y="87" text-anchor="middle" fill="#4A5240" font-size="9">motion-sensitive</text>
+  <!-- Arrows showing 180 degrees -->
+  <line x1="32" y1="100" x2="388" y2="100" stroke="#ccc" stroke-width="1" stroke-dasharray="4"/>
+  <text x="210" y="175" text-anchor="middle" fill="#4A5240" font-size="10">← Total visual field: up to 180° horizontal →</text>
+</svg>
+</div>
+<div class="two-col">
+  <div class="info-box"><h4>What Peripheral Vision Detects Best</h4>Movement, flicker, sudden changes, and contrast differences. It does NOT detect detail, colour well, or static text — but it is your earliest warning system for hazards in motion.</div>
+  <div class="info-box red"><h4 style="color:#E03C31">What Kills Peripheral Awareness</h4>Phone use (eliminates peripheral attention), fatigue (field narrows to ~70°), high stress (field can collapse to 30° — "tunnel vision"), and wearing equipment that physically blocks side vision.</div>
+</div>
+<div class="info-box warning"><h4>The 5° Trap</h4>When workers focus intensely on a task (e.g. reading a screen, fine motor work), they often drop into pure foveal vision — using only the central 5°. This is when peripheral hazards become invisible. The solution: intentional micro-breaks to widen your gaze every 5–10 minutes.</div>
+`},
+
+{type:'game-kims', title:"Kim's Game — Memory Challenge", subtitle:'28 items will appear for 30 seconds. Memorise as many as you can, then recall them.'},
+
+{type:'content', title:'What Degrades Your Visual Field', subtitle:'Evidence-based factors that narrow peripheral awareness — and how to counter them',
+html:`
+<div class="svg-wrap">
+<svg width="460" height="160" viewBox="0 0 460 160">
+  <!-- Base field line -->
+  <text x="10" y="20" fill="#4A5240" font-size="11" font-weight="700">Visual field width under different conditions:</text>
+  <!-- Normal -->
+  <rect x="10" y="35" width="440" height="24" rx="4" fill="#EFF8E4" stroke="#6DC12A"/>
+  <rect x="10" y="35" width="440" height="24" rx="4" fill="#6DC12A"/>
+  <text x="230" y="52" text-anchor="middle" fill="white" font-size="10" font-weight="700">NORMAL: ~180° field</text>
+  <!-- Fatigued -->
+  <rect x="10" y="68" width="440" height="24" rx="4" fill="#EFF8E4" stroke="#ccc"/>
+  <rect x="120" y="68" width="220" height="24" rx="4" fill="#E8A020"/>
+  <text x="230" y="85" text-anchor="middle" fill="white" font-size="10" font-weight="700">FATIGUED: ~70° field</text>
+  <!-- Stressed -->
+  <rect x="10" y="100" width="440" height="24" rx="4" fill="#EFF8E4" stroke="#ccc"/>
+  <rect x="165" y="100" width="130" height="24" rx="4" fill="#E03C31"/>
+  <text x="230" y="117" text-anchor="middle" fill="white" font-size="10" font-weight="700">HIGH STRESS: ~30° field</text>
+  <!-- Phone -->
+  <rect x="10" y="132" width="440" height="24" rx="4" fill="#f0f0f0" stroke="#ccc"/>
+  <rect x="210" y="132" width="40" height="24" rx="4" fill="#1A1A1A"/>
+  <text x="230" y="149" text-anchor="middle" fill="white" font-size="9" font-weight="700">PHONE: ~5° (fovea only)</text>
+</svg>
+</div>
+<ul class="step-list">
+  <li><div class="step-num" style="background:#E8A020">⚡</div><div><strong>Fatigue — the silent field-narrower</strong><br><span style="font-size:.85rem;color:var(--gr)">After 6+ hours without significant rest, peripheral sensitivity drops 30–40%. Workers often don't notice this happening — the brain compensates by increasing centre-field focus, masking the loss.</span></div></li>
+  <li><div class="step-num" style="background:#E03C31">🔴</div><div><strong>Task fixation / cognitive overload</strong><br><span style="font-size:.85rem;color:var(--gr)">When mentally overloaded, the brain reduces peripheral processing to preserve resources for the primary task. This is why rushing is dangerous — not just ethically, but neurologically.</span></div></li>
+  <li><div class="step-num" style="background:#1A1A1A">📱</div><div><strong>Smartphone use</strong><br><span style="font-size:.85rem;color:var(--gr)">Even when "glancing" at a phone, peripheral awareness drops to near-zero for the duration of the glance PLUS a 1–2 second cognitive recovery window. In a DC environment at walking pace, that's 3–4 metres of blind movement.</span></div></li>
+</ul>
+`},
+
+{type:'game-scan', title:'5-Second Entry Scan — Practice Round', subtitle:'A scene will appear for 5 seconds. Observe everything you can, then answer questions.'},
+
+{type:'content', title:'The STOP-LOOK-ID Habit', subtitle:'A micro-routine that takes 10 seconds and dramatically improves hazard detection',
+html:`
+<div class="info-box"><h4>Why Verbalising Hazards Works</h4>When you <em>name</em> a hazard out loud — or even sub-vocally — your brain processes it through two separate memory systems simultaneously (visual + linguistic). This dual-encoding effect makes the hazard 40% more memorable and dramatically more likely to trigger protective action (Paivio Dual Coding Theory, 1971).</div>
+<ul class="step-list">
+  <li><div class="step-num">S</div><div><strong>STOP — 2 conscious breaths</strong><br><span style="font-size:.85rem;color:var(--gr)">Physical pause before entering any new area or starting a task. Breathing deeply activates the parasympathetic nervous system, reducing tunnel vision caused by stress. This one habit is the highest-leverage change in any safety culture.</span></div></li>
+  <li><div class="step-num">L</div><div><strong>LOOK — full 180° sweep</strong><br><span style="font-size:.85rem;color:var(--gr)">Left → centre → right → above → below. Move your head, not just your eyes. Deliberately use peripheral zones. Focus especially on the transitions — doorways, corners, floor-to-wall junctions — where hazards cluster.</span></div></li>
+  <li><div class="step-num">I</div><div><strong>ID — name what you see</strong><br><span style="font-size:.85rem;color:var(--gr)">"Cable on floor at 3 o'clock." "Wet floor, no cone, near the UPS." "Person working at height, no harness." Say it — don't just think it. Naming forces cognitive engagement.</span></div></li>
+</ul>
+<div class="two-col">
+  <div class="info-box warning"><h4>The 3 Hazard Clusters</h4>In data centre environments, 80% of hazards are found in 3 zones: floor level (cables, spills), transitions (doorways, aisle ends), and overhead (unsecured equipment, lighting, cables above racks).</div>
+  <div class="info-box"><h4>Making It Automatic</h4>New habits take 66 days on average to become automatic (Lally et al., 2010). For the first 2 months: use a physical cue — touching the doorframe before entering any room triggers the STOP-LOOK-ID sequence.</div>
+</div>
+`},
+
+{type:'content', title:'Change Blindness & Inattentional Blindness', subtitle:'Two proven cognitive failures that make experienced workers miss obvious hazards',
+html:`
+<div class="two-col">
+  <div class="info-box"><h4>Change Blindness</h4>The failure to notice significant changes in a visual scene when those changes occur gradually or during a brief distraction. Classic experiment: 50% of observers failed to notice a person swap mid-conversation (Simons &amp; Levin, 1998). In a DC: cables re-routed overnight, new equipment, removed barriers — all invisible to the habituated eye.</div>
+  <div class="info-box red"><h4 style="color:#E03C31">Inattentional Blindness</h4>When focused on a primary task, the brain actively suppresses processing of unexpected objects — even large, obvious ones. The "invisible gorilla" experiment (Simons &amp; Chabris, 1999): 50% of participants watching a ball-passing video failed to see a person in a gorilla suit walk through the scene. At work: hazards that appear while you're task-focused become literally invisible.</div>
+</div>
+<div class="info-box warning"><h4>Counter-Strategy: Expect the Unexpected</h4>Simply knowing these biases exist reduces their effect. Before each shift: mentally tell yourself "Something will have changed since I was last here. I will find it." This top-down expectation primes your brain's change detection circuits. Studies show this simple mental preparation reduces change blindness errors by up to 30%.</div>
+<div class="info-box"><h4>In Practice</h4>
+  <ul style="margin-top:8px;margin-left:16px;font-size:.85rem;line-height:1.9">
+    <li>After any break, treat re-entry as if it's your first time in the space</li>
+    <li>After any contractor or maintenance visit, re-scan every area they touched</li>
+    <li>Rotate patrol routes so you never habituate to a single path</li>
+    <li>When handing over a shift, physically walk the space together — don't just brief verbally</li>
+  </ul>
+</div>
+`}
+
+], quiz:[
+  {scenario:"Priya has worked the same data hall for 18 months. She can walk it in the dark from memory. Overnight, a maintenance team rerouted three power cables at floor level in Row D.",
+   q:"Which phenomenon makes Priya most likely to trip the next morning, even while 'looking where she's going'?",
+   opts:["Confirmation bias — she expects the floor to be clear","Change blindness — her brain uses stored memory rather than actively scanning for what's new","Tunnel vision — she is cognitively overloaded from the overnight shift","Peripheral vision loss — she has worked too long and her field has narrowed"],
+   ans:1,
+   explain:"<strong>Change blindness</strong> is the primary risk here. Priya's 18-month mental map of Row D overrides active visual processing — her brain 'fills in' the familiar scene without actually scanning it. This is why the STOP-LOOK-ID habit specifically targets transition points (like entering a row): it forces active, not memory-based, observation."},
+  {scenario:"During Kim's Game, you correctly identified 8 of 12 items. Your colleague identified 6 but reported noticing a flickering fluorescent light in the room that you completely missed.",
+   q:"Your colleague's observation best illustrates which principle?",
+   opts:["Superior central vision","Active peripheral attention — noticing environmental changes while focused on the task","Confirmation bias — looking for things that match expectations","Inattentional blindness — a lucky catch"],
+   ans:1,
+   explain:"<strong>Active peripheral attention</strong> is the skill of maintaining awareness of the wider environment even while focused on a primary task. Your colleague's visual system was not fully captured by the Kim's Game items — they maintained enough peripheral bandwidth to register an anomaly (the flickering). This is the training goal: not just completing the task, but staying aware of the environment <em>while</em> completing it."},
+  {scenario:"It is 14:00 on a long day. Marcus has been at his station since 07:00 with only a 30-minute lunch break. He feels fine but notices he's been re-reading the same line in a procedure three times.",
+   q:"What is most likely happening to Marcus's visual field at this point?",
+   opts:["Nothing — visual fields are not affected by cognitive fatigue","His field has narrowed to approximately 70° due to fatigue, significantly reducing peripheral hazard detection","His field has expanded because he is more alert after a long shift","His central vision has deteriorated but peripheral vision is unaffected"],
+   ans:1,
+   explain:"<strong>After 7 hours of cognitively demanding work</strong>, research shows peripheral visual sensitivity drops 30–40%. The re-reading symptom is a cognitive fatigue indicator — which correlates directly with reduced peripheral field. Marcus's SA is degraded even though he 'feels fine.' Subjective fatigue awareness lags behind objective impairment by 60–90 minutes. This is when an unplanned 10-minute break is not optional — it's a safety control."},
+  {scenario:"Wei is performing a hot-work permit check. He is completely focused on reviewing the permit document when a forklift passes 4 metres to his right at walking pace.",
+   q:"Based on inattentional blindness research, what is the most likely outcome?",
+   opts:["Wei will notice the forklift because it is a large, moving object","Wei may completely fail to perceive the forklift due to full cognitive capture by the permit task","Wei will notice the forklift using peripheral vision","Wei will hear the forklift before seeing it"],
+   ans:1,
+   explain:"<strong>Inattentional blindness</strong> research (Simons &amp; Chabris) shows that full cognitive engagement in a task can cause complete failure to notice large, unexpected objects — even ones moving in plain sight. A forklift at 4 metres is well within visual range but NOT within Wei's attentional range. This is why hot-work zones require physical separation, barriers, and spotter protocols — not just permit procedures."},
+  {scenario:"Your site is implementing a new STOP-LOOK-ID habit. A veteran technician says: 'I've been doing this job for 12 years. I don't need to stop and scan — I know this place inside out.'",
+   q:"Which evidence-based response is most accurate?",
+   opts:["He's right — experience builds automatic hazard detection that replaces the need for deliberate scanning","Experience increases the risk of normalisation of deviance and change blindness, making deliberate scanning MORE important for veterans, not less","The habit is only for new starters — experienced workers have different cognitive needs","Veterans should do a reduced-length scan (2 seconds instead of 5)"],
+   ans:1,
+   explain:"<strong>Experience is a double-edged sword.</strong> Veterans have faster pattern recognition but are significantly more susceptible to normalisation of deviance and change blindness — precisely because their brains have built strong environmental models that resist updating. Research shows experienced workers are MORE likely to miss novel hazards, not less. The STOP-LOOK-ID habit is especially high-value for veterans because it deliberately breaks automatic processing."}
+]},
+
+// ══ MODULE 3 ══════════════════════════════════════════════════════════════════
+{ id:3, title:'Mental Wellbeing & Focus', slides:[
+
+{type:'content', title:'How Your Mental State Shapes What You See', subtitle:"The Yerkes-Dodson Law — and why 'being stressed' makes you genuinely blind to hazards",
+html:`
+<div class="svg-wrap">
+<svg width="440" height="200" viewBox="0 0 440 200">
+  <!-- Axes -->
+  <line x1="40" y1="170" x2="420" y2="170" stroke="#ccc" stroke-width="1.5"/>
+  <line x1="40" y1="20" x2="40" y2="170" stroke="#ccc" stroke-width="1.5"/>
+  <!-- Curve (inverted U) -->
+  <path d="M 40,165 C 100,165 140,30 220,28 C 300,26 360,165 420,165" fill="none" stroke="#6DC12A" stroke-width="3"/>
+  <!-- Fill under curve -->
+  <path d="M 40,165 C 100,165 140,30 220,28 C 300,26 360,165 420,165 L 420,170 L 40,170 Z" fill="rgba(109,193,42,.1)"/>
+  <!-- Zone markers -->
+  <line x1="130" y1="20" x2="130" y2="170" stroke="#E8A020" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="310" y1="20" x2="310" y2="170" stroke="#E03C31" stroke-width="1" stroke-dasharray="4"/>
+  <!-- Labels -->
+  <text x="85" y="140" text-anchor="middle" fill="#E03C31" font-size="9">Under-aroused</text>
+  <text x="85" y="152" text-anchor="middle" fill="#E03C31" font-size="9">(bored, fatigued)</text>
+  <text x="220" y="15" text-anchor="middle" fill="#3A7015" font-size="9">OPTIMAL</text>
+  <text x="220" y="26" text-anchor="middle" fill="#3A7015" font-size="9">PERFORMANCE</text>
+  <text x="365" y="140" text-anchor="middle" fill="#E03C31" font-size="9">Over-aroused</text>
+  <text x="365" y="152" text-anchor="middle" fill="#E03C31" font-size="9">(stressed, panicked)</text>
+  <text x="16" y="100" fill="#4A5240" font-size="9" transform="rotate(-90,16,100)">SA QUALITY</text>
+  <text x="230" y="185" text-anchor="middle" fill="#4A5240" font-size="9">AROUSAL / STRESS LEVEL →</text>
+</svg>
+</div>
+<div class="info-box"><h4>What Optimal Arousal Looks Like</h4>Engaged, alert, mildly challenged — not bored, not panicked. At the peak of the curve, SA is at its sharpest: you're scanning effectively, comprehending quickly, and projecting accurately. Shift briefings, stretch goals, and rotation of tasks are all tools for maintaining this zone.</div>
+<div class="info-box red"><h4 style="color:#E03C31">The Over-Arousal Collapse</h4>When stress exceeds optimal, the prefrontal cortex (your SA centre) starts going offline. Decision-making deteriorates. Visual field narrows. Working memory shrinks from 7±2 items to 3–4. This is not weakness — it is neuroscience. The solution is not willpower; it is regulation techniques.</div>
+`},
+
+{type:'game-halt', title:'HALT Self-Check — Interactive Assessment', subtitle:'Rate yourself right now on each HALT dimension. Get your real-time safety status.'},
+
+{type:'content', title:'Fatigue: The Invisible Impairment', subtitle:'17 hours awake is legally equivalent to being over the drink-drive limit in many countries',
+html:`
+<div class="fact-grid">
+  <div class="fact-card"><div class="num" style="color:#E03C31">0.05%</div><div class="lbl">BAC equivalent after 17 hours awake (Dawson &amp; Reid, 1997)</div></div>
+  <div class="fact-card"><div class="num" style="color:#E03C31">2×</div><div class="lbl">increased error rate after a 12-hour shift with no break</div></div>
+  <div class="fact-card"><div class="num">500ms</div><div class="lbl">Average microsleep duration — enough to walk 2m blind at normal pace</div></div>
+  <div class="fact-card"><div class="num" style="color:#E8A020">20 min</div><div class="lbl">Optimal nap duration for SA restoration without sleep inertia</div></div>
+</div>
+<div class="info-box warning"><h4>The Fatigue Deception</h4>Fatigued individuals consistently <strong>underestimate their own impairment</strong>. At 0.05% BAC, most people report feeling "fine" — the same impairment level that makes them twice as likely to miss a workplace hazard. This is why self-reporting fatigue is insufficient: observable behavioural cues (re-reading, slower response, mood changes) must be monitored by peers and supervisors.</div>
+<ul class="step-list">
+  <li><div class="step-num">1</div><div><strong>Microsleeps</strong><br><span style="font-size:.85rem;color:var(--gr)">Involuntary sleep episodes lasting 0.5–30 seconds. The person is usually unaware they occurred. At 15,000 steps/day in a data centre, even a 1-second microsleep near a rack edge is a serious fall risk.</span></div></li>
+  <li><div class="step-num">2</div><div><strong>Slowed cognitive switching</strong><br><span style="font-size:.85rem;color:var(--gr)">Task-switching time increases 30–50% when fatigued. This matters for SA because hazard recognition requires rapid switches between task-focus and environmental-scan modes.</span></div></li>
+  <li><div class="step-num">3</div><div><strong>Mood dysregulation</strong><br><span style="font-size:.85rem;color:var(--gr)">Irritability and emotional reactivity are early fatigue markers. A worker who snaps at a colleague may not be having a bad day — they may be too fatigued to work safely. Supervisors should treat mood changes as a safety indicator, not a conduct issue.</span></div></li>
+</ul>
+`},
+
+{type:'content', title:'Burnout & Long-Term SA Degradation', subtitle:"Burnout doesn't just affect wellbeing — it systematically destroys situational awareness",
+html:`
+<div class="two-col">
+  <div>
+    <div class="info-box"><h4>Phase 1: Enthusiasm</h4>High effort, high SA, strong motivation. Workers in this phase are often the best hazard reporters — they care, they're engaged, they see everything.</div>
+    <div class="info-box warning" style="margin-top:12px"><h4>Phase 2: Stagnation</h4>Effort plateaus. Work feels routine. SA becomes automatic and less deliberate. Near-misses stop getting reported because "it happens all the time." This is the most dangerous phase — high familiarity, declining vigilance.</div>
+    <div class="info-box red" style="margin-top:12px"><h4 style="color:#E03C31">Phase 3: Frustration &amp; Exhaustion</h4>Active disengagement. Workers stop scanning because they "know" nothing will be fixed anyway. SA collapses. Incident risk is highest here — and it is often invisible to management.</div>
+  </div>
+  <div>
+    <strong style="font-size:.9rem;color:var(--gd)">Early Warning Signs (self-monitor):</strong>
+    <ul style="margin:10px 0 0 16px;font-size:.85rem;line-height:2">
+      <li>Dreading shifts that used to feel routine</li>
+      <li>Feeling detached from colleagues or outcomes</li>
+      <li>Making errors you wouldn't normally make</li>
+      <li>Struggling to recall what happened during a shift</li>
+      <li>Increased cynicism: "What's the point of reporting?"</li>
+      <li>Physical symptoms: headaches, GI issues, poor sleep</li>
+    </ul>
+    <div class="info-box" style="margin-top:16px"><h4>What To Do</h4>Burnout is not a personal failure — it is an organisational signal. Report concerns to your EHS officer or occupational health. Peer support, task rotation, and structured breaks are evidence-based interventions. SA cannot be maintained through willpower alone in a burnout state.</div>
+  </div>
+</div>
+`},
+
+{type:'game-breath', title:'Box Breathing — Stress Regulation Technique', subtitle:'When stress is narrowing your SA, use this 4-4-4-4 technique. Do one full cycle now.'},
+
+{type:'content', title:'Creating a Speak-Up Safety Culture', subtitle:"SA doesn't end when you spot a hazard. It ends when the hazard is resolved — and that requires speaking up.",
+html:`
+<div class="info-box red"><h4 style="color:#E03C31">Why People Don't Speak Up (and the SA cost)</h4>Research across 500 organisations found the #1 reason workers don't report hazards is not laziness — it's <strong>fear of negative reaction</strong> (54%), followed by "not my job" (23%), and "it won't be fixed anyway" (18%). Each of these is an organisational failure, not an individual one.</div>
+<div class="two-col">
+  <div>
+    <strong style="color:var(--gd);font-size:.9rem">The Bystander Effect in Safety</strong>
+    <p style="font-size:.85rem;margin-top:8px;line-height:1.7;color:var(--gr)">Darley &amp; Latané (1968) showed that the more people are present, the less likely any individual is to act on a hazard — because each person assumes someone else will. In a DC with 15 people in a hall, a cable on the floor can be noticed by all 15 and reported by zero. <strong>The antidote is personal accountability:</strong> "I will act as if I am the only person who can fix this."</p>
+  </div>
+  <div>
+    <strong style="color:var(--gd);font-size:.9rem">How to Raise a Concern Effectively</strong>
+    <ul style="margin:10px 0 0 16px;font-size:.85rem;line-height:1.9">
+      <li><strong>Be specific:</strong> "The cable on Row C aisle" not "there's a mess somewhere"</li>
+      <li><strong>State the risk:</strong> "It's a trip hazard at the cabinet entrance"</li>
+      <li><strong>Suggest the fix:</strong> "Can we get a cable cover or re-route it?"</li>
+      <li><strong>Follow up:</strong> Check it was resolved before end of shift</li>
+    </ul>
+  </div>
+</div>
+<div class="info-box"><h4>Your Duty Under the WSH Act (Singapore)</h4>Under the Workplace Safety and Health Act, every employee has a legal duty to take reasonable care for their own safety AND the safety of others who may be affected by their acts or omissions. Failing to report a known hazard is not just a cultural failure — it can constitute a breach of statutory duty. Report it. Always.</div>
+`}
+
+], quiz:[
+  {scenario:"Raj arrived at work after sleeping only 4 hours due to a late flight. He feels 'OK — just a bit tired.' His supervisor asks if he's fit to operate the elevated platform today.",
+   q:"Based on fatigue science, what is the most accurate assessment of Raj's situation?",
+   opts:["If Raj says he feels OK, he is likely safe to proceed","Raj's subjective assessment is unreliable — 4 hours sleep creates impairment equivalent to ~0.05% BAC whether or not he feels it","Tiredness only affects mood, not cognitive performance or SA","Raj should be given caffeine and monitored, then cleared to proceed"],
+   ans:1,
+   explain:"<strong>Fatigued individuals consistently underestimate their own impairment.</strong> Dawson &amp; Reid (1997) showed that subjective fatigue awareness lags behind objective impairment by 60–90 minutes. After 4 hours sleep, Raj is operating at the cognitive equivalent of legally intoxicated — regardless of how he feels. Operating elevated platforms in this state creates unacceptable fall risk. The correct action is to reassign him to low-risk tasks and revisit in 2–3 hours after a rest break."},
+  {scenario:"Siti rates herself on the HALT check: H=2 (had breakfast), A=4 (anxious about a performance review today), L=1 (good team support), T=3 (slept 6 hours). Her combined HALT score is 10/20.",
+   q:"What should Siti do before starting her shift?",
+   opts:["Proceed normally — a score of 10 is average and not concerning","Use a stress regulation technique (such as box breathing) and flag her anxiety to her supervisor before high-risk tasks","Take the day off — a HALT score of 10 means she is not fit to work","Address the hunger factor first, then proceed"],
+   ans:1,
+   explain:"<strong>Siti's primary risk factor is her Angry/Anxious score of 4</strong> — not the total. An anxiety score of 4 indicates active stress-hormone elevation, which directly narrows peripheral visual field and degrades Level 3 SA (projection). The practical steps: box breathing before the shift, flag to supervisor that she needs to avoid solo high-risk tasks today, and if the performance review is after the shift, acknowledge that its anticipatory stress is already affecting her now. A score isn't a pass/fail — it's a self-management trigger."},
+  {scenario:"A highly experienced technician, Lee, has been working the same building for 8 years. He's been making small errors recently — missing procedure steps he knows by heart. He attributes it to 'just being busy.'",
+   q:"Which phase of burnout does Lee's situation suggest, and what is the primary SA risk?",
+   opts:["Phase 1 (Enthusiasm) — no significant SA risk","Phase 2 (Stagnation) — Lee is at risk of normalisation of deviance — routine tasks feel too familiar to scan actively","Phase 3 (Frustration) — active disengagement means Lee may be consciously ignoring hazards he would previously have reported","It is too early to assess — more information is needed"],
+   ans:2,
+   explain:"<strong>Lee shows Phase 3 (Frustration/Exhaustion) indicators:</strong> errors on well-known tasks (cognitive degradation), attribution to external busyness (denial), and likely reduced reporting engagement. The primary SA risk is not just that Lee misses hazards — it's that he may have stopped acting on ones he does notice. This requires a supportive conversation, not a disciplinary one: workload review, peer support, and possibly occupational health referral. SA cannot be maintained through experience alone when burnout is present."},
+  {scenario:"During a high-pressure incident response, three technicians are crowded around a server cabinet. All three notice an exposed wire nearby but none of them say anything — each assuming one of the others will deal with it.",
+   q:"Which psychological phenomenon does this illustrate, and what is the correct individual response?",
+   opts:["Normalisation of deviance — report it at the end of the incident","The bystander effect — each individual must act as if they are the only person who noticed","Inattentional blindness — the technicians did not really notice it","Confirmation bias — they assumed the wire was safe based on past experience"],
+   ans:1,
+   explain:"<strong>Classic bystander effect (Darley &amp; Latané, 1968):</strong> the presence of others reduces individual likelihood of action, with each person assuming someone else will intervene. The correct individual response is to act as if you are the only one who noticed — because psychologically, in that moment, you might as well be. One person: 'I'm flagging this exposed wire before we continue.' 10 seconds. Potentially prevents an arc flash during an already stressful incident."},
+  {scenario:"Management wants to reduce incident rates by 20% next year. They're debating between (A) increasing mandatory safety training hours by 50%, or (B) implementing peer-to-peer near-miss reporting with 24-hour response SLAs and no-blame investigation.",
+   q:"Based on SA science and safety culture research, which approach is more likely to achieve the goal?",
+   opts:["Option A — more training directly builds SA and reduces incidents","Option B — near-miss data targets the 300 precursor events per incident, and psychological safety enables reporting","Both are equally effective when implemented properly","Neither — incident rates are primarily determined by site design, not behaviour"],
+   ans:1,
+   explain:"<strong>Option B targets the root of the Heinrich Triangle</strong> — the 300 near-misses that precede each recordable incident. Training builds knowledge, but knowledge without a reporting culture doesn't change behaviour. Organisations that implement no-blame near-miss systems see 40–60% incident reductions within 18–24 months (HSE research). The 24-hour SLA is critical: if workers report a hazard and it isn't addressed, they stop reporting. Psychological safety (believing reports won't be punished) is the single strongest predictor of proactive hazard reporting."}
+]}
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let curMod = 0, curSlide = 0, quizMode = false;
+let quizIdx = 0, quizScore = 0, answered = false;
+let totalSlides = 0, totalAnswered = 0, totalCorrect = 0;
+
+function calcTotals() {
+  totalSlides = MODULES.reduce((a,m)=>a+m.slides.length,0) + MODULES.reduce((a,m)=>a+m.quiz.length,0);
+}
+
+function updateProgress() {
+  const done = MODULES.slice(0,curMod).reduce((a,m)=>a+m.slides.length+m.quiz.length,0)
+    + (quizMode ? curMod < MODULES.length ? MODULES[curMod].slides.length + quizIdx : totalSlides : curSlide);
+  const pct = Math.round(done/totalSlides*100);
+  document.getElementById('prog-bar').style.width = pct+'%';
+  document.getElementById('prog-label').textContent = pct+'%';
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function startCourse() {
+  calcTotals();
+  showScreen('screen-course');
+  renderSlide();
+}
+function restart() { curMod=0;curSlide=0;quizMode=false;quizIdx=0;quizScore=0;totalAnswered=0;totalCorrect=0; showScreen('screen-landing'); }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goMod(n) {
+  curMod = n-1; curSlide = 0; quizMode = false; quizIdx = 0;
+  renderSlide(); updateTabs();
+}
+function updateTabs() {
+  MODULES.forEach((m,i)=>{
+    const t = document.getElementById('tab-'+(i+1));
+    if(!t) return;
+    t.classList.remove('active','done');
+    if(i===curMod) t.classList.add('active');
+  });
+}
+function nextSlide() {
+  const mod = MODULES[curMod];
+  if(quizMode) {
+    if(!answered) return;
+    quizIdx++;
+    if(quizIdx >= mod.quiz.length) {
+      curMod++;
+      if(curMod >= MODULES.length) { showCert(); return; }
+      curSlide=0; quizMode=false; quizIdx=0; answered=false;
+    } else { answered=false; }
+  } else {
+    curSlide++;
+    if(curSlide >= mod.slides.length) { quizMode=true; curSlide=mod.slides.length; quizIdx=0; answered=false; }
+  }
+  renderSlide(); updateTabs(); updateProgress();
+}
+function prevSlide() {
+  if(quizMode) {
+    if(quizIdx > 0) { quizIdx--; answered=true; }
+    else { quizMode=false; curSlide=MODULES[curMod].slides.length-1; }
+  } else {
+    if(curSlide > 0) curSlide--;
+    else if(curMod > 0) { curMod--; const pm=MODULES[curMod]; quizMode=true; quizIdx=pm.quiz.length-1; curSlide=pm.slides.length; answered=true; }
+  }
+  renderSlide(); updateTabs(); updateProgress();
+}
+function showCert() {
+  const pct = Math.round(totalCorrect/totalAnswered*100)||0;
+  document.getElementById('cert-score').textContent = pct+'%';
+  showScreen('screen-cert'); updateProgress();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderSlide() {
+  const mod = MODULES[curMod];
+  const area = document.getElementById('slide-area');
+  const totalInMod = mod.slides.length + mod.quiz.length;
+  const posInMod = quizMode ? mod.slides.length + quizIdx : curSlide;
+
+  // dots
+  const dots = document.getElementById('slide-dots');
+  dots.innerHTML = '';
+  for(let i=0;i<totalInMod;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===posInMod?' active':i<posInMod?' done':'');
+    dots.appendChild(d);
+  }
+  document.getElementById('slide-counter').textContent = (posInMod+1)+' / '+totalInMod + (quizMode?' · Quiz':'');
+
+  // prev/next
+  const isFirst = curMod===0 && !quizMode && curSlide===0;
+  document.getElementById('btn-prev').style.opacity = isFirst?'0.3':'1';
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = (quizMode && quizIdx===mod.quiz.length-1 && curMod===MODULES.length-1) ? 'Finish ✓' : 'Next →';
+
+  if(quizMode) { area.innerHTML = renderQuiz(mod.quiz[quizIdx], quizIdx, mod.quiz.length); bindQuiz(); }
+  else { area.innerHTML = renderContent(mod.slides[curSlide]); bindSlide(mod.slides[curSlide]); }
+}
+
+function renderContent(slide) {
+  return `<div class="slide-card">
+    <h2>${slide.title}</h2>
+    <div class="subtitle">${slide.subtitle}</div>
+    ${slide.html||''}
+  </div>`;
+}
+
+function renderQuiz(q, idx, total) {
+  const fill = Math.round(idx/total*100);
+  return `<div class="quiz-wrap">
+    <div class="quiz-header">
+      <div class="q-num">Question ${idx+1} of ${total}</div>
+    </div>
+    <div class="q-score-bar"><div class="q-score-fill" style="width:${fill}%"></div></div>
+    ${q.scenario?`<div class="quiz-scenario"><strong>Scenario:</strong> ${q.scenario}</div>`:''}
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts" id="quiz-opts">
+      ${q.opts.map((o,i)=>`<button class="q-opt" data-i="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="quiz-explain" id="quiz-explain"><strong>Explanation:</strong> ${q.explain}</div>
+    <div class="quiz-footer">
+      <div id="quiz-feedback" style="font-size:.88rem;font-weight:700"></div>
+      <button class="btn btn-primary btn-sm" id="btn-submit" onclick="submitQuiz()" style="display:none">Check Answer</button>
+    </div>
+  </div>`;
+}
+
+function bindQuiz() {
+  document.querySelectorAll('.q-opt').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      if(answered) return;
+      document.querySelectorAll('.q-opt').forEach(b=>b.classList.remove('selected'));
+      this.classList.add('selected');
+      document.getElementById('btn-submit').style.display='inline-flex';
+    });
+  });
+  if(answered) { // re-render answered state
+    const q = MODULES[curMod].quiz[quizIdx];
+    revealAnswer(q);
+  }
+}
+
+function submitQuiz() {
+  const q = MODULES[curMod].quiz[quizIdx];
+  const sel = document.querySelector('.q-opt.selected');
+  if(!sel) return;
+  answered = true;
+  totalAnswered++;
+  const chosen = parseInt(sel.dataset.i);
+  if(chosen === q.ans) { totalCorrect++; }
+  revealAnswer(q, chosen);
+}
+
+function revealAnswer(q, chosen) {
+  const opts = document.querySelectorAll('.q-opt');
+  opts.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.ans) b.classList.add('correct');
+    else if(chosen!==undefined && i===chosen && chosen!==q.ans) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('quiz-feedback');
+  if(fb) fb.innerHTML = chosen===q.ans
+    ? '<span style="color:#3A7015">✓ Correct!</span>'
+    : `<span style="color:#E03C31">✗ The correct answer is ${String.fromCharCode(65+q.ans)}</span>`;
+  const ex = document.getElementById('quiz-explain');
+  if(ex) ex.classList.add('show');
+  const sub = document.getElementById('btn-submit');
+  if(sub) sub.style.display='none';
+}
+
+function bindSlide(slide) {
+  if(slide.type==='game-domino') initDomino();
+  if(slide.type==='game-hazard') initHazard();
+  if(slide.type==='game-kims') initKims();
+  if(slide.type==='game-scan') initScan();
+  if(slide.type==='game-halt') initHalt();
+  if(slide.type==='game-breath') initBreath();
+}
+
+// ── DOMINO GAME ──────────────────────────────────────────────────────────────
+function initDomino() {
+  const card = document.querySelector('.slide-card');
+  const zone = document.createElement('div');
+  zone.id = 'domino-zone';
+  const DOMS = [
+    {bg:'#6DC12A', icon:'⚠️', short:'Hazard<br>Exists',    label:'1. Hazard'},
+    {bg:'#4A9E1E', icon:'👁️', short:'Un-<br>noticed',      label:'2. Unnoticed'},
+    {bg:'#D4A017', icon:'🔕', short:'Un-<br>reported',     label:'3. Unreported'},
+    {bg:'#D07010', icon:'🔧', short:'Not<br>Fixed',         label:'4. Not Fixed'},
+    {bg:'#C04020', icon:'🏃', short:'Someone<br>Rushes',   label:'5. Rushing'},
+    {bg:'#E03C31', icon:'💥', short:'INCI-<br>DENT',        label:'6. INCIDENT'},
+  ];
+  zone.innerHTML =
+    '<div class="domino-wrap">' +
+    '<div style="text-align:center;color:#aaa;font-size:.75rem;margin-bottom:8px;letter-spacing:.05em">CLICK A DOMINO WHILE IT FALLS TO CATCH IT — OR PRESS START</div>' +
+    '<div class="domino-stage" id="domino-stage"><div class="domino-ground"></div>' +
+    DOMS.map((d,i)=>
+      '<div class="domino" id="dom-'+i+'" style="background:'+d.bg+'" title="'+d.label+'">' +
+      '<div class="domino-icon">'+d.icon+'</div>' +
+      '<div style="font-size:.52rem;line-height:1.3">'+d.short+'</div>' +
+      '<div class="domino-label">'+d.label+'</div>' +
+      '</div>'
+    ).join('') +
+    '</div>' +
+    '<div class="domino-controls">' +
+    '<button class="btn btn-primary btn-sm" id="btn-dstart">▶ Start Cascade</button>' +
+    '<button class="btn btn-outline btn-sm" id="btn-dreset">↺ Reset</button>' +
+    '</div>' +
+    '<div class="domino-tip">💡 Click any falling domino to stop the chain there</div>' +
+    '<div id="domino-msg" style="display:none;margin-top:12px"></div>' +
+    '</div>' +
+    '<div class="info-box" style="margin-top:12px"><h4>Key Insight</h4>You can stop the cascade at <strong>any</strong> domino. Every intervention point — noticing, reporting, fixing — breaks the chain. The most powerful intervention is always the earliest one: <em>before</em> the hazard becomes invisible.</div>';
+  card.appendChild(zone);
+  document.getElementById('btn-dstart').addEventListener('click', startDomino);
+  document.getElementById('btn-dreset').addEventListener('click', resetDomino);
+  DOMS.forEach((_,i)=>{
+    document.getElementById('dom-'+i).addEventListener('click', function(){
+      if(dominoStopped || dominoStep === 0) return;
+      clearInterval(dominoTimer);
+      dominoStopped = true;
+      this.classList.add('caught');
+      const m = document.getElementById('domino-msg');
+      if(m){
+        m.style.display='block'; m.className='info-box';
+        const labels=['perceiving the hazard','reporting the hazard','escalating the fix','getting it physically fixed','before someone rushed','before the incident'];
+        m.innerHTML='<h4 style="color:#3A7015">Chain stopped at step '+(i+1)+'</h4>You intervened at: <strong>'+labels[Math.min(i,5)]+'</strong>. This is exactly how SA saves lives — the earlier you intervene, the lower the cost.';
+      }
+    });
+  });
+}
+let dominoTimer = null, dominoStep = 0, dominoStopped = false;
+function startDomino() {
+  resetDomino();
+  dominoTimer = setInterval(()=>{
+    if(dominoStopped || dominoStep >= 6){
+      clearInterval(dominoTimer);
+      if(\!dominoStopped && dominoStep >= 6){
+        const m = document.getElementById('domino-msg');
+        if(m){m.style.display='block';m.className='info-box red';m.innerHTML='<h4 style="color:#E03C31">Incident Occurred</h4>The full chain completed. When no one intervenes, a minor unreported hazard reaches its inevitable outcome. Click Reset to try again.';}
+      }
+      return;
+    }
+    document.getElementById('dom-'+dominoStep).classList.add('fallen');
+    dominoStep++;
+  }, 900);
+}
+function resetDomino(){
+  clearInterval(dominoTimer); dominoStopped=false; dominoStep=0;
+  for(let i=0;i<6;i++){const d=document.getElementById('dom-'+i);if(d)d.classList.remove('fallen','caught');}
+  const m=document.getElementById('domino-msg');if(m)m.style.display='none';
+}
+function stopDomino(){}
+
+// ── HAZARD GAME ──────────────────────────────────────────────────────────────
+const HAZARDS = [
+  {id:'h1', cx:80,  cy:255, label:'Exposed cable trailing across walkway — trip hazard', found:false},
+  {id:'h2', cx:210, cy:260, label:'Coolant puddle on floor — no wet floor cone placed',   found:false},
+  {id:'h3', cx:680, cy:180, label:'Fire exit partially blocked by cable management tray',  found:false},
+  {id:'h4', cx:550, cy:100, label:'Unsecured stepladder leaning against rack — fall risk', found:false},
+  {id:'h5', cx:340, cy:40,  label:'Overhead cable tray overloaded — sagging dangerously',  found:false},
+  {id:'h6', cx:130, cy:150, label:'Fire extinguisher access obstructed by equipment cart', found:false},
+];
+let hazardFound = 0, hazardTimer = null, hazardSeconds = 60;
+
+function initHazard() {
+  const card = document.querySelector('.slide-card');
+  const zone = document.createElement('div');
+  zone.id = 'hazard-zone';
+
+  const hLen = HAZARDS.length;
+  // Build SVG inline string — hotspots INSIDE the SVG so no z-index issues
+  let svgStr = '<svg class="hazard-scene" viewBox="0 0 800 300" id="hazard-scene" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;border-radius:12px">';
+  // Background + ceiling
+  svgStr += '<rect width="800" height="300" fill="#1e1e1e"/>';
+  svgStr += '<rect x="0" y="0" width="800" height="18" fill="#2a2a2a"/>';
+  svgStr += '<line x1="0" y1="9" x2="800" y2="9" stroke="#444" stroke-width="1" stroke-dasharray="20,8"/>';
+  // Floor
+  svgStr += '<rect x="0" y="270" width="800" height="30" fill="#2a2a2a"/>';
+  svgStr += '<line x1="0" y1="270" x2="800" y2="270" stroke="#444" stroke-width="1.5"/>';
+  [1,2,3,4,5,6,7].forEach(i=>{ svgStr += '<line x1="'+(i*100)+'" y1="270" x2="'+(i*100)+'" y2="300" stroke="#333" stroke-width="1"/>'; });
+  [1,2].forEach(i=>{ svgStr += '<line x1="0" y1="'+(270+i*10)+'" x2="800" y2="'+(270+i*10)+'" stroke="#333" stroke-width="1"/>'; });
+  // 6 server racks
+  [60,175,290,405,520,635].forEach((x,ri)=>{
+    svgStr += '<rect x="'+x+'" y="30" width="85" height="235" rx="4" fill="#111" stroke="#6DC12A" stroke-width="1.5"/>';
+    svgStr += '<rect x="'+(x+5)+'" y="35" width="75" height="8" rx="2" fill="#6DC12A" opacity=".7"/>';
+    [50,65,80,95,110,125,140,155,170,185,200,215].forEach(y=>{
+      svgStr += '<rect x="'+(x+8)+'" y="'+y+'" width="69" height="6" rx="1" fill="#1e4d10" opacity=".8"/>';
+      svgStr += '<circle cx="'+(x+13)+'" cy="'+(y+3)+'" r="2" fill="'+(y%30===50?'#6DC12A':'#333')+'"/>';
+    });
+    svgStr += '<rect x="'+(x+5)+'" y="222" width="75" height="38" rx="2" fill="#0d2d07" stroke="#3A7015" stroke-width="1"/>';
+    svgStr += '<text x="'+(x+42)+'" y="245" text-anchor="middle" fill="#6DC12A" font-size="7" font-family="monospace">SRV-'+String(ri+1).padStart(2,'0')+'</text>';
+  });
+  // Sagging overhead cable tray
+  svgStr += '<path d="M280,18 Q340,52 400,18" stroke="#888" stroke-width="3" fill="none" stroke-dasharray="4,3"/>';
+  svgStr += '<line x1="310" y1="18" x2="320" y2="45" stroke="#888" stroke-width="1.5"/>';
+  svgStr += '<line x1="360" y1="18" x2="370" y2="48" stroke="#888" stroke-width="1.5"/>';
+  // Floor cable (red, trailing)
+  svgStr += '<path d="M20,270 Q60,262 110,268 Q130,270 140,265" stroke="#E03C31" stroke-width="3" fill="none" opacity=".8" stroke-dasharray="6,2"/>';
+  // Coolant puddle
+  svgStr += '<ellipse cx="210" cy="272" rx="25" ry="6" fill="#4A90D9" opacity=".5"/>';
+  svgStr += '<ellipse cx="215" cy="274" rx="12" ry="3" fill="#6AB0F5" opacity=".4"/>';
+  // Fire extinguisher
+  svgStr += '<rect x="95" y="200" width="12" height="30" rx="3" fill="#E03C31"/>';
+  svgStr += '<rect x="92" y="195" width="18" height="8" rx="2" fill="#C0392B"/>';
+  // Cart blocking extinguisher
+  svgStr += '<rect x="78" y="215" width="35" height="40" rx="3" fill="#555" stroke="#888" stroke-width="1"/>';
+  svgStr += '<circle cx="85" cy="256" r="4" fill="#333" stroke="#888" stroke-width="1"/>';
+  svgStr += '<circle cx="106" cy="256" r="4" fill="#333" stroke="#888" stroke-width="1"/>';
+  // Stepladder
+  svgStr += '<line x1="530" y1="30" x2="510" y2="200" stroke="#D4A017" stroke-width="3"/>';
+  svgStr += '<line x1="570" y1="30" x2="545" y2="200" stroke="#D4A017" stroke-width="3"/>';
+  [60,90,120,150].forEach(y=>{ svgStr += '<line x1="'+(530-(y-30)*0.12)+'" y1="'+y+'" x2="'+(570-(y-30)*0.14)+'" y2="'+y+'" stroke="#D4A017" stroke-width="2"/>'; });
+  // Fire exit sign + blocked cable tray
+  svgStr += '<rect x="640" y="160" width="70" height="28" rx="3" fill="#27AE60"/>';
+  svgStr += '<text x="675" y="178" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">EXIT</text>';
+  svgStr += '<rect x="640" y="188" width="80" height="14" rx="2" fill="#555" stroke="#888" stroke-width="1"/>';
+  // Aisle label
+  svgStr += '<text x="400" y="290" text-anchor="middle" fill="#555" font-size="9" font-family="monospace">AISLE C — DATA HALL 2 · DC-SG-01</text>';
+  // Hazard hotspots — INSIDE the SVG, fully clickable
+  HAZARDS.forEach(h=>{
+    svgStr += '<g id="'+h.id+'" style="cursor:pointer">';
+    svgStr += '<circle cx="'+h.cx+'" cy="'+h.cy+'" r="22" fill="rgba(255,215,0,.08)"/>';
+    svgStr += '<circle id="'+h.id+'-ring" cx="'+h.cx+'" cy="'+h.cy+'" r="14" fill="rgba(255,215,0,.15)" stroke="#FFD700" stroke-width="2.5">';
+    svgStr += '<animate attributeName="r" values="12;17;12" dur="1.4s" repeatCount="indefinite"/>';
+    svgStr += '<animate attributeName="opacity" values=".9;.5;.9" dur="1.4s" repeatCount="indefinite"/>';
+    svgStr += '</circle>';
+    svgStr += '<text x="'+h.cx+'" y="'+(h.cy+5)+'" text-anchor="middle" font-size="13" pointer-events="none">⚠️</text>';
+    svgStr += '</g>';
+  });
+  svgStr += '</svg>';
+
+  zone.innerHTML = svgStr +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 4px;flex-wrap:wrap;gap:8px">' +
+    '<div style="font-size:.88rem"><span style="font-weight:700;color:#3A7015" id="hz-found">0</span> / <span>'+hLen+'</span> hazards found</div>' +
+    '<div style="font-weight:700;color:#E03C31;font-size:.9rem" id="hz-timer">⏱ 60s remaining</div>' +
+    '</div>' +
+    '<div id="hz-log" style="min-height:26px;font-size:.82rem;color:#666;padding:4px 0;border-top:1px solid #eee;margin-bottom:4px"></div>' +
+    '<div id="hz-result" style="display:none"></div>';
+
+  card.appendChild(zone);
+
+  hazardFound = 0; hazardSeconds = 60;
+  HAZARDS.forEach(h=>{ h.found = false; });
+
+  // Wire clicks via addEventListener — works even inside SVG elements
+  HAZARDS.forEach(h=>{
+    const el = document.getElementById(h.id);
+    if(el) el.addEventListener('click', ()=>foundHazard(h.id));
+  });
+
+  hazardTimer = setInterval(()=>{
+    hazardSeconds--;
+    const el = document.getElementById('hz-timer');
+    if(el) el.textContent = '\u23F1 '+hazardSeconds+'s remaining';
+    if(hazardSeconds <= 0 || hazardFound >= HAZARDS.length){ clearInterval(hazardTimer); showHazardResult(); }
+  }, 1000);
+}
+
+function foundHazard(id) {
+  const h = HAZARDS.find(x=>x.id===id);
+  if(\!h || h.found) return;
+  h.found = true; hazardFound++;
+  // Turn ring green + stop animation
+  const ring = document.getElementById(id+'-ring');
+  if(ring){ ring.setAttribute('stroke','#6DC12A'); ring.setAttribute('fill','rgba(109,193,42,.2)'); ring.innerHTML=''; }
+  const txt = document.querySelector('#'+id+' text');
+  if(txt){ txt.textContent = '✓'; txt.setAttribute('fill','#3A7015'); txt.setAttribute('font-weight','bold'); }
+  const log = document.getElementById('hz-log');
+  if(log) log.innerHTML = '<span style="color:#3A7015">✓ Found: '+h.label+'</span>';
+  const fc = document.getElementById('hz-found');
+  if(fc) fc.textContent = hazardFound;
+  if(hazardFound >= HAZARDS.length){ clearInterval(hazardTimer); showHazardResult(); }
+}
+
+function showHazardResult(){
+  HAZARDS.forEach(h=>{
+    if(\!h.found){
+      const ring = document.getElementById(h.id+'-ring');
+      if(ring){ ring.setAttribute('stroke','#E03C31'); ring.setAttribute('fill','rgba(224,60,49,.2)'); ring.innerHTML=''; }
+      const txt = document.querySelector('#'+h.id+' text');
+      if(txt){ txt.textContent='✗'; txt.setAttribute('fill','#E03C31'); }
+    }
+  });
+  const r = document.getElementById('hz-result');
+  if(\!r) return;
+  r.style.display='block';
+  const pct = Math.round(hazardFound/HAZARDS.length*100);
+  r.className = 'info-box'+(pct<50?' red':'');
+  r.innerHTML = '<h4>'+(hazardFound===HAZARDS.length?'Perfect Score — Outstanding SA':'Time Up')+'</h4>You found <strong>'+hazardFound+'/'+HAZARDS.length+'</strong> hazards ('+pct+'%). '+(hazardFound<HAZARDS.length?'Missed hazards are highlighted in red. In a real DC, every missed hazard is a potential incident.':'You caught every hazard in the scene — outstanding situational awareness.');
+}
+
+// ── KIM'S GAME  ───────────────────────────────────────────────────────────────
+const KIMS_ITEMS=[
+  {e:'🔑',n:'Key'},{e:'🔦',n:'Torch'},{e:'🧰',n:'Toolbox'},{e:'⚠️',n:'Warning sign'},
+  {e:'🪜',n:'Stepladder'},{e:'🔌',n:'Power cable'},{e:'🧯',n:'Fire extinguisher'},{e:'📋',n:'Clipboard'},
+  {e:'🥾',n:'Safety boot'},{e:'🔒',n:'Padlock'},{e:'🪣',n:'Bucket'},{e:'🧤',n:'Gloves'},
+];
+let kimsPhase='show', kimsTimer=null, kimsSeconds=30, kimsSelected=new Set(), kimsReveal=false;
+function initKims() {
+  const card=document.querySelector('.slide-card');
+  card.innerHTML+=`
+  <div id="kims-area">
+    <div class="kims-timer" id="kims-clock">30s</div>
+    <div class="kims-grid" id="kims-grid">
+      ${KIMS_ITEMS.map((it,i)=>`<div class="kims-item" id="ki-${i}"><div>${it.e}</div><div class="name">${it.n}</div></div>`).join('')}
+    </div>
+    <div style="text-align:center;color:var(--gr);font-size:.85rem;margin-bottom:8px">Memorise all items — then recall them from memory!</div>
+  </div>`;
+  kimsPhase='show'; kimsSelected.clear(); kimsReveal=false; kimsSeconds=30;
+  kimsTimer=setInterval(()=>{
+    kimsSeconds--;
+    const cl=document.getElementById('kims-clock');
+    if(cl)cl.textContent=kimsSeconds+'s';
+    if(kimsSeconds<=0){clearInterval(kimsTimer);startKimsRecall();}
+  },1000);
+}
+function startKimsRecall(){
+  kimsPhase='recall';
+  KIMS_ITEMS.forEach((_,i)=>{const el=document.getElementById('ki-'+i);if(el)el.classList.add('hidden');});
+  const area=document.getElementById('kims-area');
+  if(!area)return;
+  const cl=document.getElementById('kims-clock');
+  if(cl)cl.textContent='Which items do you remember?';
+  area.innerHTML+=`
+  <div class="recall-grid">
+    ${KIMS_ITEMS.map((it,i)=>`<label class="recall-item" id="rl-${i}" onclick="toggleKims(${i},this)"><span>${it.e}</span><span>${it.n}</span></label>`).join('')}
+  </div>
+  <button class="btn btn-primary btn-sm" style="display:block;margin:12px auto" onclick="scoreKims()">Check My Memory</button>`;
+}
+function toggleKims(i,el){if(kimsReveal)return;el.classList.toggle('checked');if(kimsSelected.has(i))kimsSelected.delete(i);else kimsSelected.add(i);}
+function scoreKims(){
+  kimsReveal=true;
+  let correct=0;
+  KIMS_ITEMS.forEach((_,i)=>{
+    const el=document.getElementById('rl-'+i);
+    if(!el)return;
+    if(kimsSelected.has(i)){correct++;el.classList.remove('checked');el.classList.add('correct');}
+    else{el.classList.add('wrong');}
+  });
+  const area=document.getElementById('kims-area');
+  area.innerHTML+=`<div class="kims-result"><strong style="font-size:1.1rem;color:var(--g)">${correct}/12 items recalled</strong><br><span style="font-size:.85rem;color:var(--gr)">Average: 7±2 items (Miller's Law). >9 = excellent SA observation skill.</span></div>`;}
+
+// ── SCAN GAME ─────────────────────────────────────────────────────────────────
+const SCAN_SCENE=[
+  {e:'🧯',label:'fire extinguisher',x:'8%',y:'20%'},
+  {e:'💻',label:'laptop',x:'45%',y:'50%'},
+  {e:'⚠️',label:'warning sign',x:'75%',y:'15%'},
+  {e:'🔌',label:'trailing cable',x:'25%',y:'70%'},
+  {e:'💧',label:'water bottle',x:'60%',y:'70%'},
+  {e:'🪑',label:'chair',x:'85%',y:'55%'},
+];
+const SCAN_QS=[
+  {q:'How many items were in the scene?',opts:['4','5','6','7'],ans:2},
+  {q:'There was a hazard near the floor. What was it?',opts:['A water spill','A trailing cable','A broken tile','A wet floor sign'],ans:1},
+  {q:'Was there a warning sign in the scene?',opts:['Yes, top-right area','Yes, bottom-left area','No warning sign','Yes, in the centre'],ans:0},
+];
+let scanPhase='ready', scanTimer=null, scanSeconds=5;
+function initScan(){
+  const card=document.querySelector('.slide-card');
+  card.innerHTML+=`
+  <div class="scan-stage" id="scan-stage">
+    <div class="scan-countdown" id="scan-cd">TAP TO START</div>
+    ${SCAN_SCENE.map(it=>`<div class="scan-item" id="si-${it.label.replace(/ /g,'-')}" style="left:${it.x};top:${it.y}">${it.e}</div>`).join('')}
+    <div class="scan-overlay covered" id="scan-ov"></div>
+  </div>
+  <div id="scan-qa" style="display:none">
+    ${SCAN_QS.map((q,qi)=>`<div class="scan-q"><strong>Q${qi+1}: ${q.q}</strong><br>
+      ${q.opts.map((o,oi)=>`<label><input type="radio" name="sq${qi}" value="${oi}"> ${o}</label><br>`).join('')}
+    </div>`).join('')}
+    <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="scoreScan()">Check Answers</button>
+  </div>
+  <div id="scan-result"></div>`;
+  document.getElementById('scan-stage').addEventListener('click',startScan);
+}
+function startScan(){
+  if(scanPhase!=='ready')return; scanPhase='scanning';
+  const ov=document.getElementById('scan-ov'); const cd=document.getElementById('scan-cd');
+  if(ov)ov.classList.remove('covered'); if(cd)cd.style.display='none';
+  scanSeconds=5;
+  scanTimer=setInterval(()=>{
+    scanSeconds--;
+    if(scanSeconds<=0){clearInterval(scanTimer);endScan();}
+  },1000);
+}
+function endScan(){
+  const ov=document.getElementById('scan-ov'); if(ov)ov.classList.add('covered');
+  const qa=document.getElementById('scan-qa'); if(qa)qa.style.display='block';
+  scanPhase='done';
+}
+function scoreScan(){
+  let correct=0;
+  SCAN_QS.forEach((q,qi)=>{
+    const sel=document.querySelector(`input[name="sq${qi}"]:checked`);
+    const val=sel?parseInt(sel.value):-1;
+    if(val===q.ans)correct++;
+    document.querySelectorAll(`input[name="sq${qi}"]`).forEach(r=>{
+      const lbl=r.parentElement;
+      if(parseInt(r.value)===q.ans)lbl.style.color='#3A7015';
+      else if(parseInt(r.value)===val&&val!==q.ans)lbl.style.color='#E03C31';
+    });
+  });
+  const res=document.getElementById('scan-result');
+  if(res)res.innerHTML=`<div class="info-box" style="margin-top:12px"><strong>${correct}/3 correct</strong> — ${correct===3?'Perfect recall! Your 5-second scan is sharp.':'Review the highlights in green above. Regular practice trains your brain to notice more in less time.'}</div>`;}
+
+// ── HALT CHECK ───────────────────────────────────────────────────────────────
+function initHalt(){
+  const card=document.querySelector('.slide-card');
+  card.innerHTML+=`
+  <div class="halt-grid">
+    ${[
+      {k:'H',label:'Hungry',desc:'When did you last eat a proper meal? Low blood sugar slows reaction time and impairs decision-making.'},
+      {k:'A',label:'Angry / Anxious',desc:'Are you carrying emotional stress? Stress hormones constrict peripheral vision and reduce patience for safety checks.'},
+      {k:'L',label:'Lonely / Overwhelmed',desc:'Feeling isolated or overloaded? Disconnection from team reduces willingness to raise safety concerns.'},
+      {k:'T',label:'Tired',desc:'Hours since last quality sleep? After 17h awake, impairment equals 0.05% BAC — legally drunk in most countries.'},
+    ].map(h=>`<div class="halt-card">
+      <h4>${h.k} — ${h.label}</h4>
+      <p>${h.desc}</p>
+      <input type="range" min="1" max="5" value="1" class="halt-slider" id="halt-${h.k}" oninput="updateHalt()">
+      <div class="halt-level" id="halt-lv-${h.k}">1 — Low risk</div>
+    </div>`).join('')}
+  </div>
+  <div class="halt-status safe" id="halt-status">✅ You're in good shape. Stay alert and proceed normally.</div>
+  <div style="font-size:.78rem;color:var(--gr);text-align:center;margin-top:8px">This is a self-reflection tool, not a medical assessment. Always escalate serious concerns to your supervisor.</div>`;
+}
+function updateHalt(){
+  const keys=['H','A','L','T'];
+  const labels=['Low risk','Mild — monitor','Moderate — act','High — consider break','Critical — do not work at height or alone'];
+  let total=0;
+  keys.forEach(k=>{
+    const v=parseInt(document.getElementById('halt-'+k).value);
+    total+=v;
+    document.getElementById('halt-lv-'+k).textContent=v+' — '+labels[v-1];
+  });
+  const st=document.getElementById('halt-status');
+  if(total<=7){st.className='halt-status safe';st.textContent='✅ HALT status: Low risk. You are in good shape for the shift.';}
+  else if(total<=12){st.className='halt-status caution';st.textContent='⚠️ HALT status: Caution. Consider a break or buddy system before high-risk tasks.';}
+  else{st.className='halt-status danger';st.textContent='🛑 HALT status: High risk. Speak to your supervisor before starting work. Do not work at height or alone.';}
+}
+
+// ── BOX BREATHING ────────────────────────────────────────────────────────────
+let breathTimer=null, breathPhase=0;
+const BREATH_PHASES=['Inhale...','Hold...','Exhale...','Hold...'];
+const BREATH_CLASSES=['expand','hold','contract','hold'];
+function initBreath(){
+  const card=document.querySelector('.slide-card');
+  card.innerHTML+=`
+  <div style="text-align:center">
+    <div class="breath-circle" id="breath-circle">Ready</div>
+    <div class="breath-label" id="breath-label">Click the circle to begin</div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-primary btn-sm" onclick="startBreath()">▶ Start</button>
+      <button class="btn btn-outline btn-sm" onclick="stopBreath()">■ Stop</button>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:20px">
+    <div class="info-box"><h4>Why It Works</h4>4-4-4-4 breathing activates the vagus nerve, reducing cortisol within 60–90 seconds. This directly widens your peripheral visual field and restores prefrontal cortex function — giving you your SA back after a stressful moment.</div>
+    <div class="info-box"><h4>When to Use It</h4>Before any high-risk task. After receiving bad news or a stressful interaction. When you notice your breathing has become shallow. When you catch yourself rushing. At the start of each shift as a SA reset.</div>
+  </div>`;
+  document.getElementById('breath-circle').addEventListener('click',startBreath);
+}
+function startBreath(){
+  stopBreath(); breathPhase=0; runBreath();
+  breathTimer=setInterval(runBreath,4000);
+}
+function runBreath(){
+  const circle=document.getElementById('breath-circle');
+  const label=document.getElementById('breath-label');
+  if(!circle)return;
+  circle.className='breath-circle '+BREATH_CLASSES[breathPhase];
+  circle.textContent=BREATH_PHASES[breathPhase];
+  if(label)label.textContent=['Breathe in slowly for 4 counts...','Hold your breath for 4 counts...','Breathe out slowly for 4 counts...','Hold empty for 4 counts...'][breathPhase];
+  breathPhase=(breathPhase+1)%4;
+}
+function stopBreath(){ clearInterval(breathTimer); const c=document.getElementById('breath-circle'); if(c){c.className='breath-circle';c.textContent='Ready';} }
+
+window.addEventListener('beforeunload',()=>{ clearInterval(dominoTimer);clearInterval(hazardTimer);clearInterval(kimsTimer);clearInterval(scanTimer);clearInterval(breathTimer); });
+</script>
+</body></html>
