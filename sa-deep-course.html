@@ -185,6 +185,26 @@ svg text{font-family:'Segoe UI',Arial,sans-serif}
 .score-summary .s{text-align:center}
 .score-summary .s .n{font-size:2rem;font-weight:800;color:var(--g)}
 .score-summary .s .l{font-size:.75rem;color:#888}
+
+/* ── INSTRUCTOR PANEL ── */
+.inst-panel{display:flex;gap:16px;background:linear-gradient(135deg,#1A3A1A 0%,#2C5F2D 100%);border-radius:14px;padding:18px;margin-bottom:20px;align-items:flex-start;box-shadow:0 4px 20px rgba(58,112,21,.3)}
+.inst-video-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.inst-avatar-bg{width:90px;height:100px;position:relative}
+.inst-svg{width:90px;height:100px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+.inst-name-tag{text-align:center}
+.inst-name{font-weight:800;font-size:.85rem;color:#fff}
+.inst-title{font-size:.65rem;color:#9CD96B;letter-spacing:.03em}
+.inst-content-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.inst-label{font-size:.68rem;font-weight:700;letter-spacing:.08em;color:#9CD96B;text-transform:uppercase}
+.inst-script{font-size:.82rem;line-height:1.6;color:#E8F5D8;max-height:80px;overflow-y:auto;scrollbar-width:none}
+.inst-script::-webkit-scrollbar{display:none}
+.inst-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inst-controls .btn{font-size:.72rem;padding:5px 12px}
+.inst-prog-wrap{flex:1;height:4px;background:rgba(255,255,255,.15);border-radius:2px;min-width:60px}
+.inst-prog{height:4px;background:#6DC12A;border-radius:2px;width:0%;transition:width .3s linear}
+.inst-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(109,193,42,.2);border:1px solid rgba(109,193,42,.4);border-radius:20px;padding:2px 8px;font-size:.65rem;color:#9CD96B;font-weight:700}
+@keyframes inst-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.inst-speaking .inst-avatar-bg{animation:inst-pulse 0.6s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -280,7 +300,7 @@ const MODULES = [
 // ══ MODULE 1 ══════════════════════════════════════════════════════════════════
 { id:1, title:'The Domino Effect', slides:[
 
-{type:'content', title:'Ready When It Matters', subtitle:'An AnjouHealth campaign highlight — see SA principles in action before we break them down',
+{type:'content', narration:`Welcome to Module 1 of the AnjouHealth Situational Awareness Deep Course. Before we dive into the theory, watch this highlight reel from our Q1 2026 campaign. As you watch, look for the moments where someone notices a risk, processes what it means, and takes action. Those three steps — perceiving, understanding, and predicting — are exactly what this module is about. We call it the Domino Effect, and by the end of this module, you will know how to stop the chain before it reaches you.`, title:'Ready When It Matters', subtitle:'An AnjouHealth campaign highlight — see SA principles in action before we break them down',
 html:`
 <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;margin-bottom:16px">
   <iframe src="https://drive.google.com/file/d/1c5ouTbUbl0vUlvdMT8bQWFYqDmMYwwhv/preview"
@@ -290,7 +310,7 @@ html:`
 <div class="info-box"><h4>As You Watch</h4>Notice the moments where someone <em>perceives</em> a risk, makes a decision, and acts. These are the three levels of Situational Awareness in the real world — before we name them on the next slide.</div>
 `},
 
-{type:'content', title:'What is Situational Awareness?', subtitle:"Mica Endsley's 3-Level SA Model — the science behind noticing what matters",
+{type:'content', narration:`Situational Awareness was defined by Dr. Mica Endsley as a three-level process. Level One is Perception — simply noticing what is around you. Sounds, movement, objects, people. Your eyes and ears feeding you raw data. Level Two is Comprehension — understanding what that data actually means. Is that wet patch on the floor a cleaning residue, or an active leak? And Level Three is Projection — predicting what will happen next. That cable across the aisle will cause someone to trip if no one acts now. Most workplace injuries happen when workers never reach Level Three. They noticed the hazard — but never connected it to consequences.`, title:'What is Situational Awareness?', subtitle:"Mica Endsley's 3-Level SA Model — the science behind noticing what matters",
 html:`
 <div class="svg-wrap">
 <svg width="480" height="220" viewBox="0 0 480 220">
@@ -316,7 +336,7 @@ html:`
 <div class="info-box" style="background:#fdf0ef;border-left-color:#E03C31"><h4 style="color:#E03C31">Level 3 — Project</h4>Predicting what will happen <em>next</em>: "That cable across the aisle will cause someone to trip if I don't act now." Most workplace injuries happen when workers never reach Level 3.</div>
 `},
 
-{type:'content', title:'Why SA Fails: The Numbers', subtitle:'88% of workplace incidents involve some form of situational awareness failure',
+{type:'content', narration:`Let us look at the numbers behind why situational awareness breaks down. According to the Health and Safety Executive, 88 percent of workplace incidents involve human factors — and situational awareness failure is at the core of most of them. Seven in ten workers admit to ignoring a hazard they noticed at least once. When you are cognitively overloaded, you are four times more likely to miss a hazard entirely. You have around six seconds to spot a hazard and decide to act before the moment passes. There is also something called normalisation of deviance — when we see the same hazard repeatedly without incident, our brain starts to classify it as safe. That mental shortcut is one of the most dangerous awareness failures in any workplace.`, title:'Why SA Fails: The Numbers', subtitle:'88% of workplace incidents involve some form of situational awareness failure',
 html:`
 <div class="fact-grid">
   <div class="fact-card"><div class="num">88%</div><div class="lbl">of incidents involve human factors / SA failure<br><small>(HSE, 2023)</small></div></div>
@@ -330,7 +350,7 @@ html:`
 
 {type:'game-domino', title:'The Domino Effect — Interactive', subtitle:'Click START to watch how one unreported hazard cascades into a major incident. Click STOP THE CHAIN at any point.'},
 
-{type:'content', title:"Heinrich's Triangle", subtitle:'For every major injury, the data shows hundreds of near-misses were ignored',
+{type:'content', narration:`Heinrich's Triangle is a foundational model in workplace safety. For every major injury, data shows there are typically ten minor injuries, thirty property damage incidents, and six hundred near-misses or unsafe acts that went unaddressed. The numbers matter less than the message: every near-miss is a warning. Every unreported hazard is an opportunity to intervene before the chain reaches the top. In a data centre environment, where electrical, physical, and environmental hazards coexist daily, the base of that triangle is very wide. Your situational awareness — your willingness to notice and report — is what keeps it from climbing.`, title:"Heinrich's Triangle", subtitle:'For every major injury, the data shows hundreds of near-misses were ignored',
 html:`
 <div class="svg-wrap">
 <svg width="420" height="260" viewBox="0 0 420 260">
@@ -355,7 +375,7 @@ html:`
 
 {type:'game-hazard', title:'Spot the Hazards — Data Centre Floor', subtitle:'Click every hazard you can find in this scene. You have 60 seconds.'},
 
-{type:'content', title:'The 3-Level SA Response Protocol', subtitle:'A practical framework for applying SA on the job, every shift',
+{type:'content', narration:`Now let us talk about what you actually do when your situational awareness flags something. The 3-Level SA Response Protocol is your mental checklist. First — Stop. Pause whatever you are doing for two seconds. This breaks the automatic pilot mode that causes most missed hazards. Second — Look. Scan your environment deliberately: floor, overhead, surroundings. Name what you see. Third — Identify. Ask yourself: is this normal? Could it hurt me or someone else? If the answer is yes or even maybe — you report it. You do not walk past it. This three-step habit takes less than ten seconds but it is the single most effective intervention you can build.`, title:'The 3-Level SA Response Protocol', subtitle:'A practical framework for applying SA on the job, every shift',
 html:`
 <ul class="step-list">
   <li><div class="step-num">1</div><div><strong>STOP (2 breaths)</strong><br><span style="font-size:.85rem;color:var(--gr)">Before starting any task, pause for 2 intentional breaths. This brief pause activates the prefrontal cortex — the part of the brain responsible for hazard recognition. Rushing is the #1 SA killer.</span></div></li>
@@ -366,7 +386,7 @@ html:`
 <div class="info-box"><h4>Why Naming Hazards Works</h4>Saying "cable across aisle — trip hazard" out loud activates dual-encoding: your brain processes the hazard both visually and verbally, making it 40% more likely to trigger action compared to silent observation alone (Paivio, 1971).</div>
 `},
 
-{type:'content', title:'Case Study: The Silent Hazard', subtitle:'A real-pattern scenario based on data centre incident reports',
+{type:'content', narration:`Here is a real-world scenario that illustrates exactly how the domino chain works. A data centre technician notices a small coolant drip under a server rack at the start of their shift. It looks minor. They think someone else will report it. They move on. By the third hour, the drip has spread to the walkway. A colleague rushing to respond to a server alert slips — fracturing their wrist. The investigation found six separate moments where someone could have intervened. Six dominos. None were stopped. This is not a story about one person failing. It is a story about a culture where small observations were not acted on. Your report — even about something that seems minor — is the domino you stop.`, title:'Case Study: The Silent Hazard', subtitle:'A real-pattern scenario based on data centre incident reports',
 html:`
 <div class="info-box warning"><h4>Scenario Background</h4>It is 07:30. Jayden, a data centre technician, arrives for the early shift. He is running 8 minutes late after a difficult commute. He notices a small puddle of coolant near Cabinet Row C — the same spot that was wet last Tuesday. He thinks: <em>"The cleaning crew will get it. I need to get to the morning briefing."</em></div>
 <div class="two-col">
@@ -775,12 +795,14 @@ function renderSlide() {
 
 function renderContent(slide) {
   const isGame = slide.type && slide.type.startsWith('game-');
-  return `<div class="slide-card">
-    <h2>${slide.title}</h2>
-    <div class="subtitle">${slide.subtitle}</div>
-    ${slide.html||''}
-    ${isGame ? '<div id="game-zone"></div>' : ''}
-  </div>`;
+  const instrHtml = (slide.narration && curMod === 0) ? renderInstructor(slide.narration) : '';
+  return '<div class="slide-card">'
+    + instrHtml
+    + '<h2>'+slide.title+'</h2>'
+    + '<div class="subtitle">'+slide.subtitle+'</div>'
+    + (slide.html||'')
+    + (isGame ? '<div id="game-zone"></div>' : '')
+    + '</div>';
 }
 
 function renderQuiz(q, idx, total) {
@@ -1229,28 +1251,139 @@ function initBreath(){
       <button class="btn btn-primary btn-sm" onclick="startBreath()">▶ Start</button>
       <button class="btn btn-outline btn-sm" onclick="stopBreath()">■ Stop</button>
     </div>
-  </div>
-  <div class="two-col" style="margin-top:20px">
-    <div class="info-box"><h4>Why It Works</h4>4-4-4-4 breathing activates the vagus nerve, reducing cortisol within 60–90 seconds. This directly widens your peripheral visual field and restores prefrontal cortex function — giving you your SA back after a stressful moment.</div>
-    <div class="info-box"><h4>When to Use It</h4>Before any high-risk task. After receiving bad news or a stressful interaction. When you notice your breathing has become shallow. When you catch yourself rushing. At the start of each shift as a SA reset.</div>
   </div>`;
-  document.getElementById('breath-circle').addEventListener('click',startBreath);
+  const circle = document.getElementById('breath-circle');
+  if(circle) circle.addEventListener('click', startBreath);
 }
+let breathInterval=null;
 function startBreath(){
-  stopBreath(); breathPhase=0; runBreath();
-  breathTimer=setInterval(runBreath,4000);
+  stopBreath();
+  breathPhase=0;
+  runBreathPhase();
+  breathInterval=setInterval(runBreathPhase,4000);
 }
-function runBreath(){
-  const circle=document.getElementById('breath-circle');
-  const label=document.getElementById('breath-label');
-  if(!circle)return;
-  circle.className='breath-circle '+BREATH_CLASSES[breathPhase];
-  circle.textContent=BREATH_PHASES[breathPhase];
-  if(label)label.textContent=['Breathe in slowly for 4 counts...','Hold your breath for 4 counts...','Breathe out slowly for 4 counts...','Hold empty for 4 counts...'][breathPhase];
+function runBreathPhase(){
+  const c=document.getElementById('breath-circle');
+  const l=document.getElementById('breath-label');
+  if(!c||!l){stopBreath();return;}
+  c.className='breath-circle '+BREATH_CLASSES[breathPhase];
+  c.textContent=BREATH_PHASES[breathPhase];
+  l.textContent=['Breathe in slowly for 4 seconds','Hold your breath for 4 seconds','Release slowly for 4 seconds','Hold empty for 4 seconds'][breathPhase];
   breathPhase=(breathPhase+1)%4;
 }
-function stopBreath(){ clearInterval(breathTimer); const c=document.getElementById('breath-circle'); if(c){c.className='breath-circle';c.textContent='Ready';} }
+function stopBreath(){
+  clearInterval(breathInterval);
+  const c=document.getElementById('breath-circle');
+  const l=document.getElementById('breath-label');
+  if(c){c.className='breath-circle';c.textContent='Ready';}
+  if(l) l.textContent='Click the circle to begin';
+}
 
-window.addEventListener('beforeunload',()=>{ clearInterval(dominoTimer);clearInterval(hazardTimer);clearInterval(kimsTimer);clearInterval(scanTimer);clearInterval(breathTimer); });
+// ── INSTRUCTOR / NARRATION ──────────────────────────────────────────────────
+let instUtterance=null, instTimer=null, instNarText='', instTalkPhase=0, instProgTimer=null;
+
+function renderInstructor(narration){
+  instNarText=narration;
+  return `<div class="inst-panel" id="inst-panel">
+  <div class="inst-video-wrap">
+    <div class="inst-avatar-bg">
+      <svg class="inst-svg" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100" height="110" fill="#1A3A1A" rx="8"/>
+        <rect x="18" y="72" width="64" height="38" fill="#2C5F2D" rx="4"/>
+        <polygon points="50,70 36,80 50,75 64,80" fill="white"/>
+        <rect x="43" y="60" width="14" height="14" fill="#F0C8A0"/>
+        <circle cx="50" cy="48" r="24" fill="#F0C8A0"/>
+        <ellipse cx="50" cy="28" rx="24" ry="13" fill="#1A0800"/>
+        <rect x="26" y="28" width="48" height="9" fill="#1A0800"/>
+        <ellipse cx="42" cy="46" rx="3.5" ry="3" fill="white"/>
+        <ellipse cx="58" cy="46" rx="3.5" ry="3" fill="white"/>
+        <circle cx="43" cy="46" r="2" fill="#222"/>
+        <circle cx="59" cy="46" r="2" fill="#222"/>
+        <path d="M38,41 Q42,39 46,41" stroke="#1A0800" stroke-width="1.5" fill="none"/>
+        <path d="M54,41 Q58,39 62,41" stroke="#1A0800" stroke-width="1.5" fill="none"/>
+        <ellipse cx="50" cy="52" rx="2" ry="1.5" fill="#D4A080"/>
+        <ellipse id="inst-mouth" cx="50" cy="59" rx="5" ry="2" fill="#B06050"/>
+        <rect x="28" y="76" width="44" height="13" rx="3" fill="#6DC12A"/>
+        <text x="50" y="86" text-anchor="middle" fill="white" font-size="6.5" font-weight="bold">ANJOUHEALTH</text>
+      </svg>
+    </div>
+    <div class="inst-name-tag">
+      <div class="inst-name">Sarah</div>
+      <div class="inst-title">Safety Trainer</div>
+    </div>
+  </div>
+  <div class="inst-content-wrap">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div class="inst-label">Module Narration</div>
+      <div class="inst-badge">🎙 Audio</div>
+    </div>
+    <div class="inst-script" id="inst-script">${narration}</div>
+    <div class="inst-controls">
+      <button class="btn btn-primary btn-sm" id="inst-play" onclick="playNarration()">▶ Play</button>
+      <button class="btn btn-outline btn-sm" id="inst-pause" onclick="pauseNarration()" style="display:none">⏸ Pause</button>
+      <button class="btn btn-outline btn-sm" onclick="stopNarration()">⏹ Stop</button>
+      <div class="inst-prog-wrap"><div class="inst-prog" id="inst-prog"></div></div>
+    </div>
+  </div>
+</div>`;
+}
+
+function playNarration(){
+  if(!window.speechSynthesis) return;
+  if(speechSynthesis.paused){ speechSynthesis.resume(); _instSetPlaying(true); return; }
+  stopNarration();
+  instUtterance=new SpeechSynthesisUtterance(instNarText);
+  instUtterance.rate=0.88; instUtterance.pitch=1.05;
+  const voices=speechSynthesis.getVoices();
+  const pick=voices.find(v=>v.lang.startsWith('en')&&/female|woman|samantha|karen|moira|victoria/i.test(v.name))
+    ||voices.find(v=>v.lang.startsWith('en-'))
+    ||voices[0];
+  if(pick) instUtterance.voice=pick;
+  instUtterance.onstart=()=>{ _instSetPlaying(true); _instStartAnim(); _instStartProg(); };
+  instUtterance.onend=instUtterance.onerror=()=>stopNarration();
+  speechSynthesis.speak(instUtterance);
+}
+function pauseNarration(){
+  if(speechSynthesis.speaking){ speechSynthesis.pause(); _instSetPlaying(false); }
+}
+function stopNarration(){
+  speechSynthesis.cancel();
+  _instSetPlaying(false);
+  clearInterval(instTimer); clearInterval(instProgTimer);
+  const m=document.getElementById('inst-mouth'); if(m){m.setAttribute('ry','2');}
+  const p=document.getElementById('inst-prog'); if(p) p.style.width='0%';
+  const panel=document.getElementById('inst-panel'); if(panel) panel.classList.remove('inst-speaking');
+}
+function _instSetPlaying(on){
+  const play=document.getElementById('inst-play'), pause=document.getElementById('inst-pause');
+  if(play) play.style.display=on?'none':'inline-flex';
+  if(pause) pause.style.display=on?'inline-flex':'none';
+}
+function _instStartAnim(){
+  const panel=document.getElementById('inst-panel'); if(panel) panel.classList.add('inst-speaking');
+  instTalkPhase=0;
+  instTimer=setInterval(()=>{
+    if(!speechSynthesis.speaking){clearInterval(instTimer);const m=document.getElementById('inst-mouth');if(m)m.setAttribute('ry','2');return;}
+    instTalkPhase=(instTalkPhase+1)%6;
+    const m=document.getElementById('inst-mouth');
+    if(m) m.setAttribute('ry',[2,5,3,6,2,4][instTalkPhase]);
+  },140);
+}
+function _instStartProg(){
+  const words=instNarText.split(' ').length;
+  const estMs=(words/2.2)*1000;
+  let elapsed=0;
+  const step=200;
+  instProgTimer=setInterval(()=>{
+    elapsed+=step;
+    const pct=Math.min(elapsed/estMs*100,99);
+    const p=document.getElementById('inst-prog'); if(p) p.style.width=pct+'%';
+  },step);
+}
+// preload voices
+if(window.speechSynthesis) speechSynthesis.getVoices();
+
+if(window.speechSynthesis) speechSynthesis.getVoices();
 </script>
-</body></html>
+</body>
+</html>
